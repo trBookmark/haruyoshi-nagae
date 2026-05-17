@@ -16,7 +16,10 @@ enum ModelType: string
   case POST = 'Post';
 
   /**
+   * label
    * 管理画面などで表示する日本語ラベルを返す
+   *
+   * @return string
    */
   public function label(): string
   {

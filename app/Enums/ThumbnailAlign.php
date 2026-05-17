@@ -20,7 +20,10 @@ enum ThumbnailAlign: string
   case LEFT   = 'l';
 
   /**
+   * label
    * 管理画面などで表示する日本語ラベルを返す
+   *
+   * @return string
    */
   public function label(): string
   {

@@ -4,10 +4,8 @@
 .env.*
 !.env.example
 
-
 .phpactor.json
 .phpunit.result.cache
-/.codex
 /.cursor/
 /.idea
 /.nova
@@ -20,9 +18,7 @@
 /public/build
 /public/hot
 /public/storage
-/public/js/filament
-/public/css/filament
-/public/fonts/filament
+/public/*/filament/*
 
 /storage/*.key
 /storage/pail
@@ -32,13 +28,12 @@
 /storage/framework/cache
 /storage/framework/sessions
 /storage/framework/views
+/storage/framework/testing
 
 /database/*.sqlite
-/database/testing.sqlite
 
-/bootstrap/cache/*.php
-/bootstrap/cache/packages.php
-/bootstrap/cache/services.php
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
 
 /vendor
 _ide_helper.php

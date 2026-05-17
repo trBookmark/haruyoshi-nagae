@@ -1,6 +1,6 @@
 # 長江春芳 ポートフォリオ
 
-アーティスト [長江春芳](https://twitter.com/N_haruyoshi) のためのポートフォリオサイト。
+アーティスト [長江春芳](https://twitter.com/N_haruyoshi) のためのポートフォリオサイト。\
 Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整理しながらフルリニューアル。
 
 ---
@@ -14,7 +14,7 @@ Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整
 | 管理画面 | Filament v5 |
 | 画像処理 | Intervention Image v3 |
 | ローカル開発 | Docker（Laravel Sail） |
-| 本番環境 | 共用レンタルサーバー |
+| 本番環境 | 共用レンタルサーバー（SSH 使用） |
 
 ---
 
@@ -81,7 +81,7 @@ CMSに不慣れなアーティストでも扱いやすいシンプル構成を�
 - WebP・mp4 への変換なし（色味・表現の変化を防ぐ）
 - GIF アニメーションはリサイズなし（フレーム破損リスクを防ぐ）
 - EXIF 除去で位置情報等のプライバシー情報を保護しつつ、カラープロファイルは保持して色味を維持
-- 各サイズのピクセル数は `config/image_resize.php` で変更可能（コード修正不要）
+- 各サイズのピクセル数は `config/image.php` で変更可能（コード修正不要）
 
 画像は `Storage` クラス経由で `public` ディスクに保存。DB には original のファイル名のみ保存し、パス生成はアプリ側で実施。
 
@@ -133,22 +133,50 @@ CMSに不慣れなアーティストでも扱いやすいシンプル構成を�
 
 **手順:**
 
+### ローカル （Laravel Sail）
+
 ```bash
 git clone https://github.com/trBookmark/haruyoshi-nagae.git
 cd haruyoshi-nagae
 
-composer install --ignore-platform-reqs
-
-cp .env.example .env
+# ローカルPHPがある場合
+composer install
+# ローカルPHPがない場合（Dockerのみ）
+# docker run --rm -v $(pwd):/app composer install
 
 ./vendor/bin/sail up -d
-
+cp .env.example .env
 ./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate
+./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail artisan filament:assets # Filament アセットの公開
 ./vendor/bin/sail artisan storage:link
+./vendor/bin/sail artisan make:filament-user # 管理者ユーザーを対話式で作成
+./vendor/bin/sail artisan db:seed --class=PlaylistSeeder
+```
+> `sail` をエイリアス登録済みの場合は `./vendor/bin/sail` の代わりに `sail` と入力できます。
+
+### 本番 （共用レンタルサーバー）
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan filament:assets # Filament アセットの公開
+php artisan storage:link
+php artisan make:filament-user # 管理者ユーザーを対話式で作成
+php artisan db:seed --class=PlaylistSeeder
 ```
 
-> `sail` をエイリアス登録済みの場合は `./vendor/bin/sail` の代わりに `sail` と入力できます。
+## セットアップ後の追加作業
+- 管理画面 > サブカテゴリ から YouTube プレイリスト ID を実値に更新
+- （必須）no image ファイルの配置
+  - 以下のパスに `no-image.png` を配置
+  - 配置を忘れると、カテゴリのサムネイル画像未設定箇所で壊れた画像が表示される
+  - storage/app/public/images/original/no-image.png
+  - storage/app/public/images/large/no-image.png
+  - storage/app/public/images/medium/no-image.png
+  - storage/app/public/images/thumb/no-image.png
 
 ---
 

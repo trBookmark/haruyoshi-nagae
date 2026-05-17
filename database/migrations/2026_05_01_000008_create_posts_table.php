@@ -23,10 +23,6 @@ return new class extends Migration
       $table->longText('content')->comment('本文'); // 旧名: post_content
       $table->text('excerpt')->nullable()->comment('投稿抜粋'); // 旧名: post_excerpt
       $table->text('memo')->nullable()->comment('自分用メモ');
-      $table->foreignId('user_id')
-        ->constrained('users')
-        ->restrictOnDelete() // 削除を制限する（投稿が残っている限りユーザーを削除できない）
-        ->comment('投稿者ID');
       $table->timestamp('published_at')->nullable()->comment('公開日時');
       $table->timestamps();
     });

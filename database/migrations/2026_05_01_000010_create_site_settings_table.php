@@ -15,7 +15,7 @@ return new class extends Migration
     Schema::create('site_settings', function (Blueprint $table) {
       $table->comment('サイト設定テーブル');
       $table->id();
-      $table->string('page_type', 20)->default(PageType::TOP_MSG->value)->unique()->comment('使用ページタイプ'); // 旧名: type
+      $table->string('page_type', 25)->default(PageType::TOP_MSG->value)->unique()->comment('使用ページタイプ'); // 旧名: type
       $table->string('label')->comment('タイプ説明'); // 旧名: memo
       $table->string('description')->nullable()->comment('使用ページ説明文'); // 旧名: data
       $table->boolean('image_required')->default(false)->comment('画像必須フラグ');

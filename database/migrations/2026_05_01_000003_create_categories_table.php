@@ -18,7 +18,7 @@ return new class extends Migration
       $table->unsignedBigInteger('image_id')
         ->nullable()
         ->comment('カテゴリ画像'); // images テーブル作成後に FK を追加（循環依存回避）
-      $table->string('model_type', 10)->default(ModelType::IMAGE->value)->comment('使用モデル'); // 旧名: model
+      $table->string('model_type', 10)->nullable()->comment('使用モデル'); // 旧名: model
       $table->unsignedSmallInteger('sort_order')->default(0)->comment('表示順');
       $table->boolean('is_active')->default(true)->comment('使用可否'); // 旧名: use
       $table->string('description')->nullable()->comment('概要'); // og:description などに使用（旧名: memo）

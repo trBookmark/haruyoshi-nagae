@@ -19,7 +19,10 @@ enum PostStatus: string
   // case SCHEDULED = 'scheduled'; // 将来対応するかも？
 
   /**
+   * label
    * 管理画面などで表示する日本語ラベルを返す
+   *
+   * @return string
    */
   public function label(): string
   {

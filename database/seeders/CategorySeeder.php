@@ -11,7 +11,8 @@ class CategorySeeder extends Seeder
   /**
    * カテゴリの初期データを投入する
    * image_id は画像未登録のため null
-   * animation カテゴリは playlists の親コンテナのため model_type は null
+   * animation / music カテゴリは playlists の親コンテナのため model_type は null
+   * __system カテゴリはカバー画像・サイト設定画像を格納する内部専用カテゴリ
    *
    * @return void
    */
@@ -53,6 +54,17 @@ class CategorySeeder extends Seeder
         'name_ja'    => '読み物',
         'model_type' => ModelType::POST->value,
         'sort_order' => 6,
+      ],
+      // ──────────── 内部専用Category ────────────
+      // Categoryカバー画像・サイト設定画像など、フロントエンドに公開しない画像の格納先として使用
+      // is_active=false でフロントから除外する
+      // SYSTEM_NAME 定数を規約として使用
+      [
+        'name'       => Category::SYSTEM_NAME,
+        'name_ja'    => 'システム',
+        'model_type' => ModelType::IMAGE->value,
+        'sort_order' => 0,
+        'is_active'  => false, // デフォルト(true)を明示的に上書き
       ],
     ];
 

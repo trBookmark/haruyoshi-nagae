@@ -12,7 +12,7 @@ class Tag extends Model
 
   protected $fillable = [
     'name',
-    'memo',
+    'description',
     'is_active',
   ];
 
@@ -25,6 +25,20 @@ class Tag extends Model
     return [
       'is_active' => 'boolean',
     ];
+  }
+
+  // ──────────── Helper ────────────
+
+  /**
+   * isInUse
+   * タグが画像またはブログ記事に使われているかどうかを判定
+   * 削除制御の判定に使用
+   *
+   * @return bool
+   */
+  public function isInUse(): bool
+  {
+    return $this->images()->exists() || $this->posts()->exists();
   }
 
   // ──────────── Relations ────────────

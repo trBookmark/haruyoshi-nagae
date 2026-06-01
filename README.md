@@ -150,7 +150,7 @@ cp .env.example .env
 ./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail artisan filament:assets # Filament アセットの公開
 ./vendor/bin/sail artisan storage:link
-./vendor/bin/sail artisan make:filament-user # 管理者ユーザーを対話式で作成
+./vendor/bin/sail artisan make:admin-user # 管理者ユーザーを対話式で作成
 ./vendor/bin/sail artisan db:seed --class=PlaylistSeeder
 ```
 > `sail` をエイリアス登録済みの場合は `./vendor/bin/sail` の代わりに `sail` と入力できます。

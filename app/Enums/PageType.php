@@ -1,8 +1,8 @@
 <?php
 /*
  * 固定ページのタイプを表す列挙型
- * トップメッセージ、aboutメッセージ、お問い合わせメッセージ、
- * 確認メッセージ、送信完了メッセージ、著作権表示の 6種類を定義
+ * サイト名、トップメッセージ、aboutメッセージ、お問い合わせメッセージ、
+ * 確認メッセージ、送信完了メッセージ、著作権表示
  */
 namespace App\Enums;
 
@@ -12,6 +12,7 @@ enum PageType: string
 {
   use EnumHasOptions; // options() メソッドを共通化
 
+  case SITE_NAME       = 'site_name';
   case TOP_MSG         = 'top_msg';
   case ABOUT_MSG       = 'about_msg';
   case CONTACT_MSG     = 'contact_msg';
@@ -28,6 +29,7 @@ enum PageType: string
   public function label(): string
   {
     return match($this) {
+      PageType::SITE_NAME       => 'サイト名',
       PageType::TOP_MSG         => 'トップメッセージ',
       PageType::ABOUT_MSG       => 'aboutメッセージ',
       PageType::CONTACT_MSG     => 'お問い合わせメッセージ',

@@ -53,4 +53,17 @@ return [
   |
   */
   'no_image_filename' => env('NO_IMAGE_FILENAME', 'no-image.png'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | 管理画面ユーザーアバター設定
+  |--------------------------------------------------------------------------
+  */
+  'avatar' => [
+    'disk'                => 'public',
+    'accepted_mime_types' => ['image/png', 'image/jpeg'],
+    'max_size_kb'         => 3072, // 3MB Filament の maxSize() はKB単位
+    'directory'           => 'avatars',
+  ],
+
 ];

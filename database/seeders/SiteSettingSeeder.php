@@ -9,8 +9,8 @@ use Illuminate\Database\Seeder;
 class SiteSettingSeeder extends Seeder
 {
   /**
-   * サイト設定の初期データを投入する
-   * 全6件固定・削除不可
+   * サイト設定の初期データを投入
+   * 固定・削除不可
    * image_id は画像未登録のため null（管理画面から設定）
    *
    * @return void
@@ -18,6 +18,14 @@ class SiteSettingSeeder extends Seeder
   public function run(): void
   {
     $settings = [
+      [
+        // サイト名：日本語表示に使用
+        // 英語表示(トップタイトル)は .env('APP_NAME')
+        'page_type'      => PageType::SITE_NAME->value,
+        'label'          => 'サイト名',
+        'description'    => '長江 春芳',
+        'image_required' => false,
+      ],
       [
         'page_type'      => PageType::TOP_MSG->value,
         'label'          => 'トップページ文面',

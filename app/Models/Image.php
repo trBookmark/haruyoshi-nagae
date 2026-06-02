@@ -63,7 +63,7 @@ class Image extends Model
    */
   private static function baseUrl(): string
   {
-    return rtrim(config('image.cdn_url') ?? config('app.url'), '/');
+    return rtrim(config('image.cdn_url') ?: config('app.url'), '/');
   }
 
   /**

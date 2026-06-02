@@ -7,29 +7,36 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class Category extends Model
+class Category extends Model implements Sortable
 {
-  use HasFactory;
+  use HasFactory, SortableTrait;
+
+  public array $sortable = [
+    'order_column_name'  => 'sort_order',
+    'sort_when_creating' => false, // Seeder で sort_order を明示指定するため自動採番を無効化
+  ];
 
   /**
    * SYSTEM_NAME
-   * Category カバー画像/サイト設定画像などフロントエンドに公開しない内部専用 Category name
-   * is_active=false で管理
-   * フロントの where('is_active', true) クエリから除外
+   * フロントエンドに公開しない内部専用カテゴリ
+   * カテゴリカバー画像・サイト設定画像など
+   * is_active=false なので where('is_active', true) クエリから自動除外される
    *
    * Resource のフィルタリングや ImageUploadService でこの定数を使用
-   * フロントエンドに公開しない Category を一元管理する
+   * 文字列 '__system' をコード内で散在させない。
    */
   public const SYSTEM_NAME = '__system';
 
   /**
    * isSystemName
-   * 内部専用 Category かどうかを判定
-   * '__' prefix を規約とする
-   * 将来 Category が増えても定数を追加するだけで管理画面の除外フィルタが適用される
+   * 内部専用カテゴリかどうかを判定
+   * '__' プレフィックスを規約とする
+   * 将来カテゴリが増えても定数を追加するだけで管理画面の除外フィルタが自動適用される
    *
-   * @param  string $name  Category 名
+   * @param  string $name カテゴリ名
    * @return bool
    */
   public static function isSystemName(string $name): bool

@@ -69,16 +69,23 @@ class Image extends Model
   /**
    * imageUrl
    * サイズに応じた公開 URL を返す
-   * GIF アニメ: リサイズなし -> 常に original を返す
+   * original:  非公開ディスクのため例外をthrow
+   * GIF アニメ: large/medium/thumb にそのままコピーする、$size をそのまま使用
    *
-   * @param string $size original|large|medium|thumb
-   * @return string      指定サイズの公開 URL
+   * @param  string $size large|medium|thumb
+   * @return string       指定サイズの公開 URL
+   *
+   * @throws \InvalidArgumentException 無効なサイズ（originalなど）が渡された場合
    */
-  public function imageUrl(string $size = 'original'): string
+  public function imageUrl(string $size = 'large'): string
   {
-    $resolvedSize = $this->isAnimatedGif() ? 'original' : $size;
+    if ($size === 'original') {
+      throw new \InvalidArgumentException(
+        'imageUrl() の引数が無効です。large / medium / thumb のいずれかを指定してください。'
+      );
+    }
 
-    return self::baseUrl() . '/storage/images/' . $resolvedSize . '/' . $this->storage_file_name;
+    return self::baseUrl() . '/storage/images/' . $size . '/' . $this->storage_file_name;
   }
 
   /**
@@ -87,10 +94,10 @@ class Image extends Model
    * image_id が null の場合などのフォールバック用途
    * ファイル名は config('image.no_image_filename') で管理
    *
-   * @param string $size original|large|medium|thumb
-   * @return string      指定サイズのノーイメージ公開 URL
+   * @param  string $size large|medium|thumb
+   * @return string       指定サイズのノーイメージ公開 URL
    */
-  public static function noImageUrl(string $size = 'original'): string
+  public static function noImageUrl(string $size = 'large'): string
   {
     $filename = config('image.no_image_filename', 'no-image.png');
 
@@ -106,6 +113,51 @@ class Image extends Model
   public function isAnimatedGif(): bool
   {
     return $this->mime_type === 'image/gif';
+  }
+
+  // ──────────── Helper ────────────
+
+  /**
+   * isInUse
+   * 画像が他のレコードから参照されているかどうかを判定
+   * FK 制約による削除禁止の判定に使用
+   *
+   * @return bool
+   */
+  public function isInUse(): bool
+  {
+    return $this->usedByCategory()->exists()
+      || $this->usedBySiteSetting()->exists()
+      || $this->usedByPlaylist()->exists()
+      || $this->usedByPost()->exists();
+  }
+
+  /**
+   * inUseDescription
+   * 使用中の場合に管理画面に表示する説明文を返す
+   * 使用されていない場合は null を返す
+   *
+   * @return string|null
+   */
+  public function inUseDescription(): ?string
+  {
+    if ($category = $this->usedByCategory()->first()) {
+      return "カテゴリ『{$category->name}』のカバー画像として使用中";
+    }
+
+    if ($setting = $this->usedBySiteSetting()->first()) {
+      return "サイト設定『{$setting->label}』の画像として使用中";
+    }
+
+    if ($playlist = $this->usedByPlaylist()->first()) {
+      return "プレイリスト『{$playlist->name}』のサムネイルとして使用中";
+    }
+
+    if ($post = $this->usedByPost()->first()) {
+      return "ブログ記事『{$post->title}』のアイキャッチとして使用中";
+    }
+
+    return null;
   }
 
   // ──────────── Relations ────────────

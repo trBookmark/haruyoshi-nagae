@@ -13,6 +13,7 @@ Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整
 | データベース | MariaDB |
 | 管理画面 | Filament v5 |
 | 画像処理 | Intervention Image v3 |
+| Exif処理 | exiftool |
 | ローカル開発 | Docker（Laravel Sail） |
 | 本番環境 | 共用レンタルサーバー（SSH 使用） |
 
@@ -168,12 +169,28 @@ php artisan make:filament-user # 管理者ユーザーを対話式で作成
 php artisan db:seed --class=PlaylistSeeder
 ```
 
+**Cron の設定（本番のみ）:**
+
+Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」に以下を登録する。
+
+```
+* * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+スケジューラが実行するタスク：
+
+| タスク | 頻度 | 目的 |
+|---|---|---|
+| `livewire:purge-temp-uploads` | 毎日 01:00 | 画像アップロードの一時ファイル（`storage/app/private/livewire-tmp/`）を削除 |
+
+---
+
 ## セットアップ後の追加作業
+
 - 管理画面 > サブカテゴリ から YouTube プレイリスト ID を実値に更新
 - （必須）no image ファイルの配置
   - 以下のパスに `no-image.png` を配置
   - 配置を忘れると、カテゴリのサムネイル画像未設定箇所で壊れた画像が表示される
-  - storage/app/public/images/original/no-image.png
   - storage/app/public/images/large/no-image.png
   - storage/app/public/images/medium/no-image.png
   - storage/app/public/images/thumb/no-image.png

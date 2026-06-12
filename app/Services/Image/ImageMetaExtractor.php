@@ -27,14 +27,17 @@ class ImageMetaExtractor
    */
   public function extract(UploadedFile $file): array
   {
-    // getMimeType() はサーバー環境によって null を返すことがあるため、getClientMimeType() をフォールバックとして使用
+    // getMimeType() はサーバー環境によって null を返すことがあるため、
+    // getClientMimeType() をフォールバックとして使用
     // getClientMimeType() はクライアント申告値なので、
     // MIMEバリデーションは FormRequest 側で mimes: ルールによりサーバー側判定済みであることが前提
+    $mimeType = $file->getMimeType() ?? $file->getClientMimeType();
+
     return [
       'checksum'  => $this->checksum($file),
       'file_size' => $file->getSize(),
-      'mime_type' => $file->getMimeType() ?? $file->getClientMimeType(),
-      'extension' => strtolower($file->getClientOriginalExtension()),
+      'mime_type' => $mimeType,
+      'extension' => $this->extensionFromMime($mimeType, $file->getClientOriginalExtension()),
       ...$this->dimensions($file),
     ];
   }
@@ -49,6 +52,27 @@ class ImageMetaExtractor
   public function checksum(UploadedFile $file): string
   {
     return hash_file('sha256', $file->getRealPath());
+  }
+
+  /**
+   * extensionFromMime
+   * MIME タイプから拡張子を導出する
+   * getClientOriginalExtension() はクライアントのファイル名依存のため、
+   * 中身が JPEG でも .png という名前で送られると誤った拡張子になる。
+   * MIME タイプ（サーバー判定）を優先し、未知の場合はクライアント申告の拡張子にフォールバック
+   *
+   * @param  string $mimeType         MIME タイプ（サーバー判定）
+   * @param  string $clientExtension  クライアントのファイル名から取得した拡張子（フォールバック用）
+   * @return string                   拡張子（小文字・ドットなし）
+   */
+  private function extensionFromMime(string $mimeType, string $clientExtension): string
+  {
+    return match ($mimeType) {
+      'image/jpeg' => 'jpg',
+      'image/png'  => 'png',
+      'image/gif'  => 'gif',
+      default      => strtolower($clientExtension),
+    };
   }
 
   /**

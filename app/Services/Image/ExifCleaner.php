@@ -7,7 +7,7 @@ use RuntimeException;
 
 /**
  * ExifCleaner
- * ExifTool を使って画像から EXIF を除去し、ICC プロファイルを保持する
+ * ExifTool を使って画像から EXIF を除去、ICC プロファイルは保持する
  *
  * 一時ファイルの管理：
  * - 成功時：一時ファイルのパスを返す（削除は呼び出し元 ImageProcessor で実施）
@@ -60,13 +60,18 @@ class ExifCleaner
 
   /**
    * runExifTool
-   * ExifTool を実行して EXIF 除去・ICC プロファイル保持を行う
+   * ExifTool を実行して EXIF 除去・ICC プロファイル保持
    *
    * 実行コマンド：
-   *   exiftool -all= --ColorSpaceTags -o {tempPath} {sourcePath}
+   *   exiftool -all= -tagsfromfile @ -icc_profile -o {tempPath} {sourcePath}
    *     -all=            : 全メタデータを削除
-   *     --ColorSpaceTags : ICC プロファイル関連タグを除外から除外（保持）
+   *     -tagsfromfile @  : 同ファイル（@）からタグをコピー
+   *     -icc_profile     : ICC プロファイルのみ元ファイルから再コピー
    *     -o {tempPath}    : 出力先を指定（元ファイルを上書きしない）
+   *
+   * ※ --ColorSpaceTags では環境・バージョンによって ICC が削除される場合がある
+   *   （ExifTool が "ICC_Profile deleted" を出力して実際に除去される）ため、
+   *   削除後に再コピーする方式に変更
    *
    * @param  string $binary     ExifTool バイナリのフルパス
    * @param  string $perl5lib   PERL5LIB パス（空の場合は putenv をスキップ）
@@ -87,8 +92,9 @@ class ExifCleaner
     }
 
     // シェルインジェクション対策：各引数を escapeshellarg() でエスケープ
+    // -tagsfromfile @ -icc_profile で ICC プロファイルを元ファイルから再コピー
     $cmd = sprintf(
-      '%s -all= --ColorSpaceTags -o %s %s 2>&1',
+      '%s -all= -tagsfromfile @ -icc_profile -o %s %s 2>&1',
       escapeshellcmd($binary),
       escapeshellarg($tempPath),
       escapeshellarg($sourcePath),

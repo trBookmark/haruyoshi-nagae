@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Image\ExifCleaner;
+use App\Services\Image\IccProfileEmbedder;
 use App\Services\Image\ImageFileNameGenerator;
 use App\Services\Image\ImageMetaExtractor;
 use App\Services\Image\ImageProcessor;
@@ -23,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
     $this->app->singleton(ImageUploadService::class, function () {
       $exifCleaner  = new ExifCleaner();
       $resizer      = new ImageResizer();
-      $processor    = new ImageProcessor($exifCleaner, $resizer);
+      $iccEmbedder  = new IccProfileEmbedder();
+      $processor    = new ImageProcessor($exifCleaner, $resizer, $iccEmbedder);
 
       return new ImageUploadService(
         fileNameGenerator: new ImageFileNameGenerator(),

@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Users\Schemas;
 use App\Enums\UserRole;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -24,8 +24,8 @@ class UserForm
     return $schema
       ->components([
 
-        // Section::make('基本情報')
-        //   ->schema([
+        Section::make('基本情報')
+          ->schema([
 
             TextInput::make('name')
               ->label('ユーザー名')
@@ -48,10 +48,10 @@ class UserForm
               // disabled 時は Filament が値を保存しないため、DB は変更されない
               ->disabled(fn ($record) => $record?->id === auth()->id()),
 
-        //   ]),
+          ]),
 
-        // Section::make('アバター')
-        //   ->schema([
+        Section::make('アバター')
+          ->schema([
 
             FileUpload::make('avatar')
               ->label('アバター画像')
@@ -62,10 +62,10 @@ class UserForm
               ->directory(config('image.avatar.directory', 'avatars'))
               ->deletable(),
 
-        //   ]),
+          ]),
 
-        // Section::make('パスワード')
-        //   ->schema([
+        Section::make('パスワード')
+          ->schema([
 
             TextInput::make('password')
               ->label('パスワード')
@@ -92,7 +92,7 @@ class UserForm
               // 確認フィールドは DB に保存しない
               ->dehydrated(false),
 
-          // ]),
+          ]),
 
       ]);
   }

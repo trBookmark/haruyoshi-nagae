@@ -7,10 +7,32 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
   use HasFactory;
+
+  /**
+   * booted
+   * Modelイベント登録
+   * deleting: DB レコード削除前に Storage ファイルを削除
+   *
+   * @return void
+   */
+  protected static function booted(): void
+  {
+    static::deleting(function (Image $image): void {
+      // original（非公開 local ディスク）
+      Storage::disk('local')->delete('images/original/' . $image->storage_file_name);
+
+      // large / medium / thumb（公開 public ディスク）
+      foreach (array_keys(config('image.resize', [])) as $size) {
+        Storage::disk('public')->delete('images/' . $size . '/' . $image->storage_file_name);
+      }
+    });
+  }
 
   protected $fillable = [
     'category_id',
@@ -70,7 +92,7 @@ class Image extends Model
    * imageUrl
    * サイズに応じた公開 URL を返す
    * original:  非公開ディスクのため例外をthrow
-   * GIF アニメ: large/medium/thumb にそのままコピーする、$size をそのまま使用
+   * GIF アニメ: large/medium/thumb にそのままコピー、$size をそのまま使用
    *
    * @param  string $size large|medium|thumb
    * @return string       指定サイズの公開 URL
@@ -182,5 +204,52 @@ class Image extends Model
   public function tags(): BelongsToMany
   {
     return $this->belongsToMany(Tag::class, 'image_tag');
+  }
+
+  // ──────────── 使用箇所リレーション（削除制御・説明文生成用） ────────────
+
+  /**
+   * usedByCategory
+   * この画像をカバー画像として使用している Category
+   * HasMany：将来的に複数カテゴリで同一画像を使用するケースに備えて HasMany で定義
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function usedByCategory(): HasMany
+  {
+    return $this->hasMany(Category::class, 'image_id');
+  }
+
+  /**
+   * usedBySiteSetting
+   * この画像を使用している SiteSetting
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function usedBySiteSetting(): HasMany
+  {
+    return $this->hasMany(SiteSetting::class, 'image_id');
+  }
+
+  /**
+   * usedByPlaylist
+   * この画像をサムネイルとして使用している Playlist
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function usedByPlaylist(): HasMany
+  {
+    return $this->hasMany(Playlist::class, 'image_id');
+  }
+
+  /**
+   * usedByPost
+   * この画像をアイキャッチとして使用している Post
+   *
+   * @return \Illuminate\Database\Eloquent\Relations\HasMany
+   */
+  public function usedByPost(): HasMany
+  {
+    return $this->hasMany(Post::class, 'image_id');
   }
 }

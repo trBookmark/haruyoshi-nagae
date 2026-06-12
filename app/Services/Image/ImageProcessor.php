@@ -9,17 +9,23 @@ use Illuminate\Http\UploadedFile;
  * 画像処理制御
  *
  * 処理経路：
- * - GIF  : ExifCleaner をスキップ → ImageResizer でコピーのみ
+ * - GIF  : ExifCleaner をスキップ → ImageResizer でコピーのみ（ICC 再適用もスキップ）
  * - 非GIF: ExifCleaner で EXIF 除去 → ImageResizer でリサイズ・保存
- *          → 一時ファイルを削除（Exif除去失敗時はExifCleaner側で削除）
+ *          → IccProfileEmbedder で ICC プロファイル再適用
+ *          → 一時ファイルを削除（EXIF 除去失敗時は ExifCleaner 側で削除）
  *
  * original の保存（非公開）は ImageResizer で実施（GIF・非GIF 共通）
+ *
+ * ICC プロファイルの再適用が必要な理由：
+ * GD ドライバ（Intervention Image v3）はリサイズ時に ICC プロファイルを破棄するため、
+ * ExifCleaner 出力の一時ファイル（ICC 保持済み）から再抽出して各サイズに再適用する。
  */
 class ImageProcessor
 {
   public function __construct(
-    private readonly ExifCleaner  $exifCleaner,
-    private readonly ImageResizer $resizer,
+    private readonly ExifCleaner       $exifCleaner,
+    private readonly ImageResizer      $resizer,
+    private readonly IccProfileEmbedder $iccEmbedder,
   ) {}
 
   /**
@@ -45,17 +51,22 @@ class ImageProcessor
     $this->resizer->saveOriginal($sourcePath, $storageFileName);
 
     if ($isGif) {
-      // GIF アニメ：EXIF 除去なし・コピーのみ
+      // GIF アニメ：EXIF 除去なし・ICC 再適用なし・コピーのみ
       $this->resizer->resize($sourcePath, $storageFileName, isGif: true);
       return;
     }
 
-    // 非GIF：EXIF 除去 → リサイズ・保存 → 一時ファイル削除
+    // 非GIF：EXIF 除去 → リサイズ・保存 → ICC 再適用 → 一時ファイル削除
     $tempPath = null;
 
     try {
       $tempPath = $this->exifCleaner->clean($sourcePath, $extension);
       $this->resizer->resize($tempPath, $storageFileName, isGif: false);
+
+      // リサイズ後に ICC プロファイルを再適用
+      // ICC が存在しない場合は IccProfileEmbedder 内でスキップされる
+      $this->iccEmbedder->embed($tempPath, $storageFileName);
+
     } finally {
       // 成功・失敗に関わらず一時ファイルを削除（ImageProcessor の責任）
       if ($tempPath !== null && file_exists($tempPath)) {

@@ -23,12 +23,12 @@ class CategoriesTable
   public static function configure(Table $table): Table
   {
     return $table
-      // システムカテゴリ（"__"プレフィックス）は一覧から除外
+      // システムカテゴリ（"__" プレフィックス）は一覧から除外
       // _ は SQL ワイルドカードのためエスケープ
       ->modifyQueryUsing(fn ($query) => $query->where('name', 'not like', '\\_\\_%'))
       ->reorderable('sort_order')
       ->defaultSort('sort_order', 'asc')
-      ->description('「並べ替え」ボタンをクリックするとドラッグ＆ドロップで順番を変更できます（チェックマークをクリックで並べ替えを保存）')
+      ->description('並べ替えボタン "⇅" をクリックするとドラッグ＆ドロップで順番を変更できます（チェックマーク "✓" をクリックで並べ替えを保存）')
       ->columns([
 
         ImageColumn::make('cover_image_url')

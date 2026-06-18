@@ -4,12 +4,14 @@ namespace App\Filament\Resources\Categories\Schemas;
 
 use App\Enums\ModelType;
 use App\Models\Category;
-use App\Models\Image;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 
 class CategoryForm
 {
@@ -48,18 +50,41 @@ class CategoryForm
           ->placeholder('選択してください')
           ->visible(fn () => auth()->user()?->isAdmin()),
 
-        // image_id：__system カテゴリの画像から選択（暫定実装）
-        // TODO: ImageUploadService 完成後、CategoryForm 上で直接アップロードできるよう差し替える
-        Select::make('image_id')
-          ->label('カバー画像')
-          ->options(fn () => Image::whereHas('category', fn ($q) => $q->where('name', Category::SYSTEM_NAME))
-            ->get()
-            ->mapWithKeys(fn (Image $image) => [$image->id => $image->title ?? $image->storage_file_name])
-            ->toArray()
-          )
-          ->searchable()
-          ->placeholder('未設定')
-          ->helperText('カバー画像はカテゴリ用にアップロードされた画像から選択できます'),
+        // カバー画像：現在の画像プレビュー（編集画面のみ）
+        Placeholder::make('cover_image_preview')
+          ->label('現在のカバー画像')
+          ->content(function (?Category $record): HtmlString {
+            if (! $record?->coverImage) {
+              return new HtmlString('<span style="color:#6b7280; font-size:0.875rem;">未設定</span>');
+            }
+
+            $url = $record->coverImage->imageUrl('thumb');
+
+            return new HtmlString(
+              '<img src="' . e($url) . '" alt="現在のカバー画像"'
+              . ' style="max-width:160px; max-height:120px; object-fit:contain;'
+              . ' border:1px solid #e5e7eb; border-radius:6px;">'
+            );
+          }),
+
+        // カバー画像：アップロード
+        // storeFiles(false)：Filament の自動保存を使わず EditCategory::handleRecordUpdate() で処理
+        // アップロード先は __system カテゴリに固定（EditCategory 側で設定）
+        FileUpload::make('cover_image')
+          ->label('カバー画像をアップロード')
+          ->image()
+          ->acceptedFileTypes(config('image.allowed_mime_types', ['image/jpeg', 'image/png', 'image/gif']))
+          ->maxSize(config('image.upload_max_size_kb', 2097152))
+          ->helperText(function (): string {
+            $allowedMimes = config('image.allowed_mime_types', ['image/jpeg', 'image/png', 'image/gif']);
+            $labels = array_map(
+              fn (string $mime) => strtoupper(explode('/', $mime)[1]),
+              $allowedMimes,
+            );
+
+            return implode('・', $labels) . ' をアップロードできます。アップロードすると現在の画像が置き換えられます。';
+          })
+          ->storeFiles(false),
 
         Toggle::make('is_active')
           ->label('使用可否')

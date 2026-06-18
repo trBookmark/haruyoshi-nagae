@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Images\Schemas;
 
+use App\Enums\ModelType;
 use App\Enums\ThumbnailAlign;
 use App\Filament\Resources\Images\Pages\CreateImage;
 use App\Models\Category;
@@ -33,7 +34,7 @@ class ImageForm
         Section::make('画像ファイル')
           ->schema([
 
-            // 編集画面で表示：現在登録されている画像のプレビュー＋差し替え警告
+            // 編集画面のみ：現在登録されている画像のプレビューと差し替え警告を表示
             Placeholder::make('current_image_preview')
               ->label('現在の画像')
               ->content(function (?Image $record): HtmlString {
@@ -85,11 +86,8 @@ class ImageForm
             Select::make('category_id')
               ->label('カテゴリ')
               ->options(fn () => Category::query()
-                // 編集者には __system カテゴリを非表示
-                ->when(
-                  ! auth()->user()?->isAdmin(),
-                  fn ($q) => $q->where('name', 'not like', '\\_\\_%')
-                )
+                ->where('model_type', ModelType::IMAGE->value)
+                ->where('name', 'not like', '\\_\\_%')
                 ->where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name_ja', 'id')

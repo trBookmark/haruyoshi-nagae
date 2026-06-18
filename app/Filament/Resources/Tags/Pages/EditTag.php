@@ -16,6 +16,7 @@ class EditTag extends EditRecord
   /**
    * getHeaderActions
    * 使われているタグは削除ボタンを非表示にする
+   * 削除成功後は一覧画面へリダイレクト
    *
    * @return array
    */
@@ -23,19 +24,48 @@ class EditTag extends EditRecord
   {
     return [
       DeleteAction::make()
-        ->hidden(fn (Tag $record) => $record->isInUse()) // 使用中タグは削除ボタン自体を非表示
-        ->using(function (Tag $record) {
+        ->hidden(fn (Tag $record) => $record->isInUse())
+        ->using(function (Tag $record): void {
           try {
             $record->delete();
           } catch (QueryException $e) {
-            // 万が一 isInUse() をすり抜けた場合の FK 制約違反をユーザーへ通知
             Notification::make()
               ->title('削除できません')
               ->body('このタグは画像またはブログ記事に使用されているため削除できません。')
               ->danger()
               ->send();
+
+            return;
           }
+
+          // ->using() を使うと ->successRedirectUrl() が発火しないため自前でリダイレクト
+          redirect(TagResource::getUrl('index'));
         }),
     ];
+  }
+
+  /**
+   * getRedirectUrl
+   * 保存後：一覧画面へリダイレクト
+   *
+   * @return string
+   */
+  protected function getRedirectUrl(): string
+  {
+    return $this->getResource()::getUrl('index');
+  }
+
+  /**
+   * getSavedNotification
+   * 保存完了通知（persistent で強調）
+   *
+   * @return \Filament\Notifications\Notification|null
+   */
+  protected function getSavedNotification(): ?Notification
+  {
+    return Notification::make()
+      ->title('タグを保存しました')
+      ->success()
+      ->persistent();
   }
 }

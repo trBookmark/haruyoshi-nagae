@@ -26,12 +26,11 @@ class ImagesTable
   public static function configure(Table $table): Table
   {
     return $table
-      ->modifyQueryUsing(function ($query) {
-        // 編集者には __system カテゴリの画像を非表示
-        if (! auth()->user()?->isAdmin()) {
-          $query->whereHas('category', fn ($q) => $q->where('name', 'not like', '\\_\\_%'));
-        }
-      })
+      // __system カテゴリの画像は全ユーザーに非表示
+      // カバー画像・サイト設定画像は各 Resource の編集画面から操作する
+      ->modifyQueryUsing(fn ($query) =>
+        $query->whereHas('category', fn ($q) => $q->where('name', 'not like', '\\_\\_%'))
+      )
       ->columns([
 
         ImageColumn::make('thumb_url')
@@ -104,11 +103,7 @@ class ImagesTable
         SelectFilter::make('category_id')
           ->label('カテゴリ')
           ->options(fn () => Category::query()
-            // 編集者には __system カテゴリを非表示
-            ->when(
-              ! auth()->user()?->isAdmin(),
-              fn ($q) => $q->where('name', 'not like', '\\_\\_%')
-            )
+            ->where('name', 'not like', '\\_\\_%')
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->pluck('name_ja', 'id')
@@ -140,8 +135,7 @@ class ImagesTable
 
       ])
       ->toolbarActions([
-        // カテゴリがさほど多くないことと、使用中画像の誤削除防止の観点から
-        // 一括削除は提供しない
+        // 一括削除なし（使用中画像の誤削除防止）
       ])
       ->defaultSort('created_at', 'desc');
   }

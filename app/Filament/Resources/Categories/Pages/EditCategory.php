@@ -130,8 +130,9 @@ class EditCategory extends EditRecord
   /**
    * metaFields
    * フォームデータからカテゴリのメタ情報カラムのみを抽出して返す
-   * name は編集者では disabled のため $data に含まれない場合がある
-   * その場合は現在のレコード値を使用する
+   * name / model_type は編集者に disabled/非表示のため $data に含まれないケースがある
+   * その場合の対処にフォールバックとして現在のレコード値を使用
+   * 編集者の保存時に既存の model_type が毎回 null で上書きされるバグになるためフォールバック必須
    *
    * @param  array<string, mixed> $data
    * @return array<string, mixed>
@@ -141,7 +142,7 @@ class EditCategory extends EditRecord
     return [
       'name'        => $data['name'] ?? $this->getRecord()->name,
       'name_ja'     => $data['name_ja'],
-      'model_type'  => $data['model_type'] ?? null,
+      'model_type'  => $data['model_type'] ?? $this->getRecord()->model_type?->value,
       'is_active'   => $data['is_active'] ?? true,
       'description' => $data['description'] ?? null,
     ];

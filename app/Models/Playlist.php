@@ -5,10 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class Playlist extends Model
+class Playlist extends Model implements Sortable
 {
-  use HasFactory;
+  use HasFactory, SortableTrait;
+
+  public array $sortable = [
+    'order_column_name'  => 'sort_order',
+    'sort_when_creating' => false, // 手動で sort_order を設定するため
+  ];
 
   protected $fillable = [
     'category_id',
@@ -48,7 +55,7 @@ class Playlist extends Model
 
   /**
    * thumbnail
-   * Playlist のサムネイル画像
+   * Playlist のカバー画像
    * image_id は nullable のため withDefault() は使用しない
    *
    * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

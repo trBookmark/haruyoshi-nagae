@@ -22,7 +22,7 @@ class CategoryResource extends Resource
   protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedRectangleStack;
   protected static ?string $navigationLabel                   = 'カテゴリ';
   protected static ?string $modelLabel                        = 'カテゴリ';
-  protected static string | UnitEnum | null $navigationGroup  = '作品管理';
+  protected static string | UnitEnum | null $navigationGroup  = 'カテゴリ管理';
   protected static ?int    $navigationSort                    = 10;
 
   /**

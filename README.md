@@ -190,7 +190,7 @@ Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」
 - 管理画面 > サブカテゴリ から YouTube プレイリスト ID を実値に更新
 - （必須）no image ファイルの配置
   - 以下のパスに `no-image.png` を配置
-  - 配置を忘れると、カテゴリのサムネイル画像未設定箇所で壊れた画像が表示される
+  - 配置を忘れると、カテゴリのカバー画像未設定箇所で壊れた画像が表示される
   - storage/app/public/images/large/no-image.png
   - storage/app/public/images/medium/no-image.png
   - storage/app/public/images/thumb/no-image.png

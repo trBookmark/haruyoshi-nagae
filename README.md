@@ -195,6 +195,21 @@ Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」
   - storage/app/public/images/medium/no-image.png
   - storage/app/public/images/thumb/no-image.png
 
+## テスト
+
+Pest および別のテスト用 DB `testing` を使用
+（`RefreshDatabase` で毎回初期化されるため）
+
+```bash
+# 初回のみ: テスト用 DB を作成
+./vendor/bin/sail mariadb -e "CREATE DATABASE IF NOT EXISTS testing;"
+
+# 全テスト実行
+./vendor/bin/sail pest
+
+# 特定のテストのみ実行
+./vendor/bin/sail pest --filter=SystemCategoryGuardTest
+```
 ---
 
 ## 担当範囲

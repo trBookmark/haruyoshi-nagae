@@ -24,6 +24,7 @@ class CategoryPolicy
    * view
    * カテゴリ詳細の表示権限
    * 管理者・編集者：許可
+   * __system カテゴリ：管理者のみ許可（編集者の直接URLアクセスを禁止）
    *
    * @param  \App\Models\User $user
    * @param  \App\Models\Category $category
@@ -31,6 +32,10 @@ class CategoryPolicy
    */
   public function view(User $user, Category $category): bool
   {
+    if (Category::isSystemName($category->name)) {
+      return $user->isAdmin();
+    }
+
     return true;
   }
 
@@ -52,8 +57,8 @@ class CategoryPolicy
    * update
    * カテゴリ編集の権限
    * 管理者：全て許可
-   * 編集者：一部制限あり
-   * name / model_type の編集制限はフォーム側で制御
+   * 編集者：一部制限あり（name / model_type の編集制限はフォーム側で制御）
+   * __system カテゴリ：管理者のみ許可（編集者の直接URLアクセスを禁止）
    *
    * @param  \App\Models\User $user
    * @param  \App\Models\Category $category
@@ -61,6 +66,10 @@ class CategoryPolicy
    */
   public function update(User $user, Category $category): bool
   {
+    if (Category::isSystemName($category->name)) {
+      return $user->isAdmin();
+    }
+
     return true;
   }
 

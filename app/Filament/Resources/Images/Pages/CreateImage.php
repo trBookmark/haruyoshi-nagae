@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Images\Pages;
 
 use App\Filament\Resources\Images\ImageResource;
+use App\Filament\Support\SystemCategoryGuard;
 use App\Models\Image;
 use App\Services\Image\ImageUploadService;
 use Filament\Notifications\Notification;
@@ -19,10 +20,10 @@ class CreateImage extends CreateRecord
    * ImageUploadService 経由でファイルを処理し、Image レコードを作成する
    * Filament デフォルトの Model::create() を置き換える
    *
-   * ValidationException（重複・不正ファイル等）はキャッチして通知を表示し、
+   * ValidationException（__system 指定・重複・不正ファイル等）はキャッチして通知を表示し、
    * halt() でフォームの遷移を止める
    *
-   * @param  array<string, mixed> $data フォームデータ（image キー: UploadedFile）
+   * @param  array<string, mixed> $data フォームデータ（image キーに UploadedFile が入る）
    * @return \Illuminate\Database\Eloquent\Model
    */
   protected function handleRecordCreation(array $data): Model
@@ -32,8 +33,11 @@ class CreateImage extends CreateRecord
     /** @var \App\Services\Image\ImageUploadService $service */
     $service = app(ImageUploadService::class);
 
-    $result = null;
     try {
+      // 多重防御：ImageForm::category_id の ->rule() を
+      // 直接リクエスト送信で回避された場合の保険
+      SystemCategoryGuard::assertNotSystemCategory((int) $data['category_id']);
+
       $result = $service->upload($file, (int) $data['category_id']);
     } catch (ValidationException $e) {
       $messages = collect($e->errors())->flatten()->implode(' ');
@@ -66,20 +70,20 @@ class CreateImage extends CreateRecord
   /**
    * getCreatedNotification
    * 作成成功時の通知
-   * "作成" '保存して続けて作成" どちらにも表示
+   * 「作成」「保存して続けて作成」どちらのボタンでも表示される
    *
    * @return \Filament\Notifications\Notification|null
    */
   protected function getCreatedNotification(): ?Notification
   {
     return Notification::make()
-      ->title('画像の登録が完了しました')
+      ->title('画像を登録しました')
       ->success();
   }
 
   /**
    * getRedirectUrl
-   * "作成" ボタン押下後のリダイレクト
+   * 「作成」ボタン押下後のリダイレクト先
    * 一覧画面へ戻る（誤って上書き登録を防ぐため）
    *
    * @return string
@@ -91,7 +95,7 @@ class CreateImage extends CreateRecord
 
   /**
    * getCreateAnotherRedirectUrl
-   * "保存して続けて作成" ボタン押下後のリダイレクト
+   * 「保存して続けて作成」ボタン押下後のリダイレクト先
    * 新規作成画面へ遷移
    *
    * @return string

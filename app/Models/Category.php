@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ModelType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,14 @@ class Category extends Model implements Sortable
   ];
 
   /**
+   * SYSTEM_PREFIX
+   * 内部専用カテゴリを表す名前のプレフィックス
+   * isSystemName() と scopeExcludingSystem() の両方がこの定数を参照する
+   * 文字列 '__' をコード内で散在させない
+   */
+  public const SYSTEM_PREFIX = '__';
+
+  /**
    * SYSTEM_NAME
    * フロントエンドに公開しない内部専用カテゴリ
    * カテゴリカバー画像・サイト設定画像など
@@ -33,7 +42,7 @@ class Category extends Model implements Sortable
   /**
    * isSystemName
    * 内部専用カテゴリかどうかを判定
-   * '__' プレフィックスを規約とする
+   * SYSTEM_PREFIX を規約とする
    * 将来カテゴリが増えても定数を追加するだけで管理画面の除外フィルタが自動適用される
    *
    * @param  string $name カテゴリ名
@@ -41,7 +50,23 @@ class Category extends Model implements Sortable
    */
   public static function isSystemName(string $name): bool
   {
-    return str_starts_with($name, '__');
+    return str_starts_with($name, self::SYSTEM_PREFIX);
+  }
+
+  /**
+   * scopeExcludingSystem
+   * 内部専用カテゴリ（SYSTEM_PREFIX で始まるもの）を除外するクエリスコープ
+   * 管理画面の一覧表示（CategoriesTable / ImagesTable 経由）で使用
+   * '_' は SQL ワイルドカードのためエスケープする
+   *
+   * @param  \Illuminate\Database\Eloquent\Builder $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeExcludingSystem(Builder $query): Builder
+  {
+    $escapedPrefix = str_replace('_', '\\_', self::SYSTEM_PREFIX);
+
+    return $query->where('name', 'not like', $escapedPrefix . '%');
   }
 
   protected $fillable = [

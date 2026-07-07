@@ -17,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
+use Illuminate\Validation\Rule;
 
 class ImageForm
 {
@@ -39,17 +40,24 @@ class ImageForm
               ->label('カテゴリ')
               ->options(fn () => Category::query()
                 ->where('model_type', ModelType::IMAGE->value)
-                ->where('name', 'not like', '\\_\\_%')
+                ->excludingSystem()
                 ->where('is_active', true)
                 ->orderBy('sort_order')
                 ->pluck('name_ja', 'id')
               )
               ->required()
               ->searchable()
-              ->placeholder('選択してください'),
+              ->placeholder('選択してください')
+              // 多重防御：ドロップダウン選択肢の改ざん（直接リクエスト送信）による
+              // __system カテゴリへの割り当てをサーバーサイドでも禁止する
+              ->rule(fn () => Rule::exists('categories', 'id')->where(
+                fn ($query) => $query->where('model_type', ModelType::IMAGE->value)
+                  ->excludingSystem()
+                  ->where('is_active', true)
+              )),
 
             TextInput::make('title')
-              ->helperText('右の＋ボタンからタグを作成できます。複数設定可能。')
+              ->helperText('個別ページのタイトルとして使用（空欄可）')
               ->label('タイトル')
               ->maxLength(255)
               ->placeholder('未設定'),
@@ -63,14 +71,14 @@ class ImageForm
               ->placeholder((string) now()->year),
 
             TextInput::make('caption')
-              ->helperText('1行の解説文。空欄可。個別ページのタイトルの下に表示されます。')
-              ->label('キャプション')
+              ->helperText('簡単な解説文、画像詳細ページのタイトルの下に表示（空欄可）')
+              ->label('1行コメント')
               ->maxLength(255)
               ->placeholder('未設定'),
 
             Select::make('tags')
               ->required()
-              ->helperText('複数設定可能。右の＋ボタンからタグを新規作成できます。')
+              ->helperText('（必須）複数設定可、右の＋ボタンからタグの新規作成が可能')
               ->label('タグ')
               ->multiple()
               ->relationship('tags', 'name')
@@ -86,12 +94,6 @@ class ImageForm
                   ->maxLength(190)
                   ->unique('tags', 'name'),
 
-                Textarea::make('description')
-                  ->label('概要')
-                  ->rows(3)
-                  ->maxLength(255)
-                  ->helperText('タグ一覧ページの Twitterカードの説明文などに使用'),
-
                 Toggle::make('is_active')
                   ->label('使用可否')
                   ->default(true),
@@ -99,13 +101,11 @@ class ImageForm
               ->createOptionUsing(function (array $data): int {
                 return Tag::create([
                   'name'        => $data['name'],
-                  'description' => $data['description'] ?? null,
                   'is_active'   => $data['is_active'] ?? true,
                 ])->getKey();
               }),
 
-          ]
-        ),
+        ]),
 
         Section::make('画像ファイル')
           ->schema([
@@ -151,7 +151,8 @@ class ImageForm
               ->storeFiles(false),
 
         ]),
-        Section::make('公開設定・メモ')
+
+        Section::make('公開設定')
           ->schema([
 
             Toggle::make('is_active')
@@ -159,20 +160,24 @@ class ImageForm
               ->default(true),
 
             Select::make('thumbnail_align')
-              ->helperText('一覧のスクエア表示で寄せる方向を指定')
+              ->helperText('（必須）一覧のスクエア表示で画像を寄せる方向を指定')
               ->label('サムネイル配置')
               ->options(ThumbnailAlign::options())
               ->default(ThumbnailAlign::CENTER->value)
               ->required(),
+        ]),
+
+        Section::make('メモ')
+          ->schema([
 
             Textarea::make('memo')
               ->helperText('管理用メモ（サイトには表示されません）')
-              ->label('メモ（自分用）')
+              ->label('自分用メモ')
               ->rows(3)
               ->maxLength(1000),
 
-          ]),
-        ]);
+            ])
+          ]);
 
   }
 }

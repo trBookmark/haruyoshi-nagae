@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Images\Pages;
 
 use App\Filament\Resources\Images\ImageResource;
+use App\Filament\Support\SystemCategoryGuard;
 use App\Models\Image;
 use App\Services\Image\ImageUploadService;
 use Filament\Actions\DeleteAction;
@@ -51,10 +52,11 @@ class EditImage extends EditRecord
 
   /**
    * handleRecordUpdate
-   * 画像ファイルが差し替えられた場合のみ ImageUploadService 経由で再処理
+   * category_id が __system カテゴリでないことを検証したうえで、
+   * 画像ファイルが差し替えられた場合のみ ImageUploadService 経由で再処理する
    * ファイルなし（メタ情報のみの編集）の場合はデフォルト動作に委譲
    *
-   * ValidationException（重複・不正ファイル等）はキャッチして通知を表示し、
+   * ValidationException（__system 指定・重複・不正ファイル等）はキャッチして通知を表示し、
    * halt() でフォームの遷移を止める
    *
    * @param  \Illuminate\Database\Eloquent\Model  $record
@@ -64,6 +66,23 @@ class EditImage extends EditRecord
   protected function handleRecordUpdate(Model $record, array $data): Model
   {
     /** @var \App\Models\Image $record */
+
+    try {
+      // 多重防御：ImageForm::category_id の ->rule() を
+      // 直接リクエスト送信で回避された場合の保険
+      SystemCategoryGuard::assertNotSystemCategory((int) $data['category_id']);
+    } catch (ValidationException $e) {
+      $messages = collect($e->errors())->flatten()->implode(' ');
+
+      Notification::make()
+        ->title('更新できません')
+        ->body($messages)
+        ->danger()
+        ->persistent()
+        ->send();
+
+      $this->halt();
+    }
 
     // image キーに UploadedFile が入っている場合のみ再アップロード処理
     if (! empty($data['image'])) {

@@ -28,8 +28,9 @@ class ImagesTable
     return $table
       // __system カテゴリの画像は全ユーザーに非表示
       // カバー画像・サイト設定画像は各 Resource の編集画面から操作する
+      // 除外条件は Category::scopeExcludingSystem() に一元化（ハードコード禁止）
       ->modifyQueryUsing(fn ($query) =>
-        $query->whereHas('category', fn ($q) => $q->where('name', 'not like', '\\_\\_%'))
+        $query->whereHas('category', fn ($q) => $q->excludingSystem())
       )
       ->columns([
 
@@ -103,7 +104,7 @@ class ImagesTable
         SelectFilter::make('category_id')
           ->label('カテゴリ')
           ->options(fn () => Category::query()
-            ->where('name', 'not like', '\\_\\_%')
+            ->excludingSystem()
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->pluck('name_ja', 'id')

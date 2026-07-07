@@ -23,9 +23,9 @@ class CategoriesTable
   public static function configure(Table $table): Table
   {
     return $table
-      // システムカテゴリ（"__" プレフィックス）は一覧から除外
-      // _ は SQL ワイルドカードのためエスケープ
-      ->modifyQueryUsing(fn ($query) => $query->where('name', 'not like', '\\_\\_%'))
+      // システムカテゴリ（__system 等）は一覧から除外
+      // 除外条件は Category::scopeExcludingSystem() に一元化（ハードコード禁止）
+      ->modifyQueryUsing(fn ($query) => $query->excludingSystem())
       ->reorderable('sort_order')
       ->defaultSort('sort_order', 'asc')
       ->description('並べ替えボタン "⇅" をクリックするとドラッグ＆ドロップで順番を変更できます（チェックマーク "✓" をクリックで並べ替えを保存）')

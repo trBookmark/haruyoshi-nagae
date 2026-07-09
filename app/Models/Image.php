@@ -164,19 +164,19 @@ class Image extends Model
   public function inUseDescription(): ?string
   {
     if ($category = $this->usedByCategory()->first()) {
-      return 'カテゴリ "{$category->name}" のカバー画像として使用中';
+      return "カテゴリ「{$category->name}」のカバー画像として使用中";
     }
 
     if ($setting = $this->usedBySiteSetting()->first()) {
-      return 'サイト設定 "{$setting->label}" の画像として使用中';
+      return "サイト設定「{$setting->label}」の画像として使用中";
     }
 
     if ($playlist = $this->usedByPlaylist()->first()) {
-      return 'プレイリスト "{$playlist->name}" のカバー画像として使用中';
+      return "プレイリスト「{$playlist->name}」のカバー画像として使用中";
     }
 
     if ($post = $this->usedByPost()->first()) {
-      return 'ブログ記事 "{$post->title}" のアイキャッチとして使用中';
+      return "ブログ記事「{$post->title}」のアイキャッチとして使用中";
     }
 
     return null;

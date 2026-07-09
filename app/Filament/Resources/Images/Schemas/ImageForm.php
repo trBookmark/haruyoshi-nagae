@@ -50,9 +50,11 @@ class ImageForm
               ->placeholder('選択してください')
               // 多重防御：ドロップダウン選択肢の改ざん（直接リクエスト送信）による
               // __system カテゴリへの割り当てをサーバーサイドでも禁止する
+              // closure に素の Query\Builder が渡されるので Eloquent スコープ
+              // excludingSystem() は呼べない → Category::systemLikePattern() を参照
               ->rule(fn () => Rule::exists('categories', 'id')->where(
                 fn ($query) => $query->where('model_type', ModelType::IMAGE->value)
-                  ->excludingSystem()
+                  ->where('name', 'not like', Category::systemLikePattern())
                   ->where('is_active', true)
               )),
 

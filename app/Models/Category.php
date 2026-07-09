@@ -23,7 +23,7 @@ class Category extends Model implements Sortable
   /**
    * SYSTEM_PREFIX
    * 内部専用カテゴリを表す名前のプレフィックス
-   * isSystemName() と scopeExcludingSystem() の両方がこの定数を参照する
+   * isSystemName(), systemLikePattern() から参照
    * 文字列 '__' をコード内で散在させない
    */
   public const SYSTEM_PREFIX = '__';
@@ -54,19 +54,32 @@ class Category extends Model implements Sortable
   }
 
   /**
+   * systemLikePattern
+   * 内部専用カテゴリにマッチする LIKE パターンを返す
+   * '_' は SQL ワイルドカードのためエスケープする
+   * scopeExcludingSystem(), Rule::exists()->where()
+   * （素の Query\Builder が渡るため Eloquent スコープを呼べない箇所）
+   * の両方から参照する
+   *
+   * @return string
+   */
+  public static function systemLikePattern(): string
+  {
+    return str_replace('_', '\\_', self::SYSTEM_PREFIX) . '%';
+  }
+
+  /**
    * scopeExcludingSystem
    * 内部専用カテゴリ（SYSTEM_PREFIX で始まるもの）を除外するクエリスコープ
    * 管理画面の一覧表示（CategoriesTable / ImagesTable 経由）で使用
-   * '_' は SQL ワイルドカードのためエスケープする
+   * LIKE パターンは systemLikePattern() に集約
    *
    * @param  \Illuminate\Database\Eloquent\Builder $query
    * @return \Illuminate\Database\Eloquent\Builder
    */
   public function scopeExcludingSystem(Builder $query): Builder
   {
-    $escapedPrefix = str_replace('_', '\\_', self::SYSTEM_PREFIX);
-
-    return $query->where('name', 'not like', $escapedPrefix . '%');
+    return $query->where('name', 'not like', self::systemLikePattern());
   }
 
   protected $fillable = [

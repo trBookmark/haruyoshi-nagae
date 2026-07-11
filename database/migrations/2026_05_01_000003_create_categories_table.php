@@ -11,7 +11,7 @@ return new class extends Migration
   {
     // seeder で初期データを投入
     Schema::create('categories', function (Blueprint $table) {
-      $table->comment('カテゴリーテーブル');
+      $table->comment('カテゴリテーブル');
       $table->id();
       $table->string('name', 190)->unique()->comment('カテゴリ名');
       $table->string('name_ja')->comment('カテゴリ表示名'); // 旧名: j_name

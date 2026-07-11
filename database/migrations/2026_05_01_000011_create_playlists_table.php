@@ -22,7 +22,7 @@ return new class extends Migration
         ->nullable()
         ->constrained('images') // 規約を使用して参照されるテーブルとカラムの名前を決定
         ->restrictOnDelete() // 削除を制限する（該当画像は削除できない）
-        ->comment('サムネイル画像');
+        ->comment('カバー画像');
       $table->unsignedSmallInteger('sort_order')->default(0)->comment('表示順');
       $table->boolean('is_active')->default(true)->comment('使用可否'); // 旧名: use
       $table->string('description')->nullable()->comment('概要'); // og:description などに使用（旧名: memo）

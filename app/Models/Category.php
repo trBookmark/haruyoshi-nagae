@@ -3,38 +3,83 @@
 namespace App\Models;
 
 use App\Enums\ModelType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class Category extends Model
+class Category extends Model implements Sortable
 {
-  use HasFactory;
+  use HasFactory, SortableTrait;
+
+  public array $sortable = [
+    'order_column_name'  => 'sort_order',
+    'sort_when_creating' => false, // Seeder で sort_order を明示指定するため自動採番を無効化
+  ];
+
+  /**
+   * SYSTEM_PREFIX
+   * 内部専用カテゴリを表す名前のプレフィックス
+   * isSystemName(), systemLikePattern() から参照
+   * 文字列 '__' をコード内で散在させない
+   */
+  public const SYSTEM_PREFIX = '__';
 
   /**
    * SYSTEM_NAME
-   * Category カバー画像/サイト設定画像などフロントエンドに公開しない内部専用 Category name
-   * is_active=false で管理
-   * フロントの where('is_active', true) クエリから除外
+   * フロントエンドに公開しない内部専用カテゴリ
+   * カテゴリカバー画像・サイト設定画像など
+   * is_active=false なので where('is_active', true) クエリから自動除外される
    *
    * Resource のフィルタリングや ImageUploadService でこの定数を使用
-   * フロントエンドに公開しない Category を一元管理する
+   * 文字列 '__system' をコード内で散在させない。
    */
   public const SYSTEM_NAME = '__system';
 
   /**
    * isSystemName
-   * 内部専用 Category かどうかを判定
-   * '__' prefix を規約とする
-   * 将来 Category が増えても定数を追加するだけで管理画面の除外フィルタが適用される
+   * 内部専用カテゴリかどうかを判定
+   * SYSTEM_PREFIX を規約とする
+   * 将来カテゴリが増えても定数を追加するだけで管理画面の除外フィルタが自動適用される
    *
-   * @param  string $name  Category 名
+   * @param  string $name カテゴリ名
    * @return bool
    */
   public static function isSystemName(string $name): bool
   {
-    return str_starts_with($name, '__');
+    return str_starts_with($name, self::SYSTEM_PREFIX);
+  }
+
+  /**
+   * systemLikePattern
+   * 内部専用カテゴリにマッチする LIKE パターンを返す
+   * '_' は SQL ワイルドカードのためエスケープする
+   * scopeExcludingSystem(), Rule::exists()->where()
+   * （素の Query\Builder が渡るため Eloquent スコープを呼べない箇所）
+   * の両方から参照する
+   *
+   * @return string
+   */
+  public static function systemLikePattern(): string
+  {
+    return str_replace('_', '\\_', self::SYSTEM_PREFIX) . '%';
+  }
+
+  /**
+   * scopeExcludingSystem
+   * 内部専用カテゴリ（SYSTEM_PREFIX で始まるもの）を除外するクエリスコープ
+   * 管理画面の一覧表示（CategoriesTable / ImagesTable 経由）で使用
+   * LIKE パターンは systemLikePattern() に集約
+   *
+   * @param  \Illuminate\Database\Eloquent\Builder $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeExcludingSystem(Builder $query): Builder
+  {
+    return $query->where('name', 'not like', self::systemLikePattern());
   }
 
   protected $fillable = [

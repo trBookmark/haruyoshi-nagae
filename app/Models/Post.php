@@ -7,10 +7,35 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class Post extends Model
+class Post extends Model implements Sortable
 {
-  use HasFactory;
+  use HasFactory, SortableTrait;
+
+  /**
+   * booted
+   * Model イベント登録
+   * saving: ステータスが「公開」かつ published_at 未設定の場合に現在日時を自動セット
+   * 下書き・非公開に戻しても published_at は保持する（クリアは手動）
+   *
+   * @return void
+   */
+  protected static function booted(): void
+  {
+    static::saving(function (Post $post): void {
+      if ($post->status === PostStatus::PUBLISHED && $post->published_at === null) {
+        $post->published_at = now();
+      }
+    });
+  }
+
+  public array $sortable = [
+    'order_column_name'  => 'sort_order',
+    'sort_when_creating' => true, // 新規記事は末尾に自動採番（一覧のドラッグで並び替え可能）
+  ];
 
   protected $fillable = [
     'sort_order',
@@ -35,6 +60,28 @@ class Post extends Model
       'status'       => PostStatus::class,
       'published_at' => 'datetime',
     ];
+  }
+
+  // ──────────── Helper ────────────
+
+  /**
+   * deleteWithEyecatch
+   * ブログ記事の削除時、アイキャッチ画像が他から参照されていなければ画像レコード＋ファイルを削除
+   * posts.image_id は restrictOnDelete のため、先に記事を削除してから画像を削除する
+   *
+   * @return void
+   */
+  public function deleteWithEyecatch(): void
+  {
+    DB::transaction(function (): void {
+      $eyecatch = $this->eyecatch;
+
+      $this->delete();
+
+      if ($eyecatch && ! $eyecatch->isInUse()) {
+        $eyecatch->delete(); // Image::booted() の deleting イベントで Storage ファイルも削除される
+      }
+    });
   }
 
   // ──────────── Relations ────────────

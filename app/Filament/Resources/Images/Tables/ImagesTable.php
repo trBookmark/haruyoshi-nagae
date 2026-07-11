@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Images\Tables;
 
+use App\Enums\ModelType;
 use App\Models\Category;
 use App\Models\Image;
 use Filament\Actions\DeleteAction;
@@ -29,8 +30,12 @@ class ImagesTable
       // __system カテゴリの画像は全ユーザーに非表示
       // カバー画像・サイト設定画像は各 Resource の編集画面から操作する
       // 除外条件は Category::scopeExcludingSystem() に一元化（ハードコード禁止）
+      // アイキャッチ画像（model_type = POST のカテゴリ所属）も Post 編集画面からのみ操作するため除外
       ->modifyQueryUsing(fn ($query) =>
-        $query->whereHas('category', fn ($q) => $q->excludingSystem())
+        $query->whereHas('category', fn ($q) => $q
+          ->where('model_type', ModelType::IMAGE->value)
+          ->excludingSystem()
+        )
       )
       ->columns([
 
@@ -104,6 +109,7 @@ class ImagesTable
         SelectFilter::make('category_id')
           ->label('カテゴリ')
           ->options(fn () => Category::query()
+            ->where('model_type', ModelType::IMAGE->value)
             ->excludingSystem()
             ->where('is_active', true)
             ->orderBy('sort_order')
@@ -128,7 +134,7 @@ class ImagesTable
             } catch (QueryException $e) {
               Notification::make()
                 ->title('削除できません')
-                ->body($record->inUseDescription() ?? 'この画像は他のレコードで使用されているため削除できません。')
+                ->body($record->inUseDescription() ?? 'この画像は他のページで使用されているため削除できません。')
                 ->danger()
                 ->send();
             }

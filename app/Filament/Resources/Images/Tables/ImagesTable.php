@@ -101,7 +101,7 @@ class ImagesTable
           ->label('登録日時')
           ->dateTime('Y/m/d H:i')
           ->sortable()
-          ->toggleable(isToggledHiddenByDefault: true),
+          ->toggleable(), // 最近追加した画像を探しやすいようデフォルト表示（列トグルで非表示可）
 
       ])
       ->filters([

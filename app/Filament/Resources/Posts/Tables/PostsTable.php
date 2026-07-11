@@ -71,7 +71,7 @@ class PostsTable
           ->label('作成日時')
           ->dateTime('Y/m/d H:i')
           ->sortable()
-          ->toggleable(isToggledHiddenByDefault: true),
+          ->toggleable(), // 最近追加した記事を探しやすいようデフォルト表示（列トグルで非表示可）
 
       ])
       ->filters([

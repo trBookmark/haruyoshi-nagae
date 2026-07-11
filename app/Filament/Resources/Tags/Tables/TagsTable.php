@@ -56,7 +56,7 @@ class TagsTable
           ->label('作成日時')
           ->dateTime('Y/m/d H:i')
           ->sortable()
-          ->toggleable(isToggledHiddenByDefault: true), // デフォルト非表示、カラムが増えたときの視認性を確保
+          ->toggleable(), // 最近追加したタグを探しやすいようデフォルト表示（列トグルで非表示可）
 
       ])
       ->filters([

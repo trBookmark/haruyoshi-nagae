@@ -75,4 +75,18 @@ class PlaylistPolicy
   {
     return false;
   }
+
+  /**
+   * reorder
+   * サブカテゴリ並び替えの権限
+   * 管理者・編集者：許可
+   * メソッド未定義でも並び替えは動作するが、意図を明示するため定義する
+   *
+   * @param  \App\Models\User $user
+   * @return bool
+   */
+  public function reorder(User $user): bool
+  {
+    return true;
+  }
 }

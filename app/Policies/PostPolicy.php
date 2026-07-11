@@ -79,8 +79,7 @@ class PostPolicy
    * reorder
    * ブログ並び替えの権限
    * 管理者・編集者：許可
-   * Policy Class でメソッド未定義のアビリティは拒否されるため明示的に定義
-   * メモ：Playlist は Policy がないので定義不要で並び替え可能
+   * メソッド未定義でも並び替えは動作するが、意図を明示するため定義する
    *
    * @param  \App\Models\User $user
    * @return bool

@@ -212,12 +212,13 @@ class IccProfileEmbedder
       putenv('PERL5LIB=' . $perl5lib);
     }
 
-    // '-icc_profile<=' を ExifTool オプションとして解釈させるためダブルクォートで囲む
-    // さらに sh -c 経由で実行してシェルに正しく渡す
+    // '-icc_profile<=パス' を1引数として escapeshellarg で保護する
+    // sh -c 経由のため単引用符がシェルに解釈され、リダイレクト誤解釈・
+    // パス内の空白や特殊文字の問題を同時に防げる
     $innerCmd = sprintf(
-      '%s "-icc_profile<=%s" -overwrite_original %s 2>&1',
+      '%s %s -overwrite_original %s 2>&1',
       escapeshellcmd($binary),
-      $iccTempPath,
+      escapeshellarg('-icc_profile<=' . $iccTempPath),
       escapeshellarg($targetPath),
     );
 

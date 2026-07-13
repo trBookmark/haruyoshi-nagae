@@ -1,5 +1,11 @@
 .l-main {
+  grid-area: main;
+  min-height: 0; // grid 子の縮小を許可（これがないと内容分だけ伸びる）
+  width: 100%; // auto マージン＋container-type: size の組み合わせで縮まないよう明示
   max-width: var(--content-max-width);
   padding-inline: var(--space-md);
   margin-inline: auto;
+  overflow-y: auto; // 全ページで内部スクロールを担当（body は固定フレーム）
+  // スクロール端のバウンス・スクロール連鎖を抑止（アプリ風）
+  overscroll-behavior-y: none;
 }

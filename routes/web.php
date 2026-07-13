@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// トップページ（本実装は手順2で HomeController に差し替え）
-Route::view('/', 'home')->name('home');
+// トップページ
+Route::get('/', HomeController::class)->name('home');
 
 // Gallery（カテゴリ一覧）
 // Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');

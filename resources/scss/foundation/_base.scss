@@ -18,14 +18,20 @@
 }
 
 html {
-  // スクロールバー分の幅を常に予約（レイアウトシフト防止）
-  scrollbar-gutter: stable;
-  // スクロール端のバウンス・スクロール連鎖を抑止（アプリ風）
-  overscroll-behavior-y: none;
   background-color: var(--color-bg);
 }
 
+// 固定フレーム：body は常に画面ぴったり。スクロールは .l-main の内部のみ（アプリ的挙動）
 body {
+  position: relative; // ドロワー開閉ボタン等の absolute 配置の基準
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'header'
+    'main'
+    'footer';
+  height: 100dvh;
+  overflow: clip;
   font-family: var(--font-family-base);
   font-weight: var(--font-weight-base);
   line-height: var(--line-height-base);
@@ -61,4 +67,26 @@ p {
 :focus-visible {
   outline: 2px solid var(--color-link);
   outline-offset: 2px;
+}
+
+// アプリ風ボックス：大画面ではサイト全体を中央のカードとして表示（旧 big_holizonal 踏襲）
+// ビューポート基準値をボックス寸法に差し替えることで、ページ側の計算式はそのまま機能する
+@media (min-width: 1400px) and (min-height: 700px) {
+  :root {
+    --viewport-w: var(--content-max-width);
+    --viewport-h: var(--content-max-height);
+  }
+
+  html {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+
+  body {
+    width: var(--content-max-width);
+    height: var(--content-max-height);
+    min-height: 0;
+    box-shadow: var(--shadow-box);
+  }
 }

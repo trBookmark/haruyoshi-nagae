@@ -1,5 +1,7 @@
 // ヘッダー：筆記体のサイトタイトルのみ（旧 p-header）
 .l-header {
+  grid-area: header;
+
   &__site-name {
     height: var(--header-height);
     font-family: var(--font-family-handwriting);

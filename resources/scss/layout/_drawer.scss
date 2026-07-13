@@ -34,8 +34,9 @@
 }
 
 // ドロワー開閉ボタン（ハンバーガー）
+// body 基準の absolute：通常時は画面右上、アプリ風ボックス時はボックス右上に自動追従
 .l-drawer-toggle {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   z-index: var(--z-drawer);

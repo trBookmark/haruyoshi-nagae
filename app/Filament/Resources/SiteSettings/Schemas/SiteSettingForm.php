@@ -7,6 +7,7 @@ use App\Models\SiteSetting;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
@@ -83,6 +84,11 @@ class SiteSettingForm
               // Filament の自動保存を使わず handleRecordUpdate で処理するため
               // storeFiles を無効化してフォームデータとして UploadedFile を受け取る
               ->storeFiles(false),
+
+            TextInput::make('image_alt')
+              ->label('画像の代替テキスト')
+              ->helperText('（空欄可）画像の内容を短く説明する文。スクリーンリーダーの読み上げや、画像を表示できない環境で使われます（255文字まで）')
+              ->maxLength(255),
 
         ])
           ->visible(fn (?SiteSetting $record): bool => (bool) $record?->image_required),

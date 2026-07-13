@@ -17,6 +17,7 @@ class SiteSetting extends Model
     'description',
     'image_required',
     'image_id',
+    'image_alt',
   ];
 
   protected $attributes = [

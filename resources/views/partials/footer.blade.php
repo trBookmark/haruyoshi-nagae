@@ -17,6 +17,7 @@
     </ul>
   </nav>
   <p class="l-footer__copyright">
+    <img class="l-footer__copyright-icon" src="{{ Vite::asset('resources/images/icon.png') }}" width="24" height="24" alt="">
     <small>&copy; {{ date('Y') }} {{ config('app.name') }}</small>
   </p>
 </footer>

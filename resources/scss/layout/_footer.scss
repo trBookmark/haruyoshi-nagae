@@ -1,5 +1,7 @@
 // フッター：ページナビ＋コピーライト（旧 p-footer / c-copyright）
 .l-footer {
+  grid-area: footer;
+
   &__nav-list {
     display: flex;
     align-items: center;
@@ -35,5 +37,11 @@
     font-family: var(--font-family-handwriting);
     line-height: var(--footer-height);
     text-align: center;
+  }
+
+  &__copyright-icon {
+    display: inline-block;
+    margin-right: var(--space-sm);
+    vertical-align: middle;
   }
 }

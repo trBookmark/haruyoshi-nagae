@@ -35,6 +35,10 @@
     <section class="p-top__text">
       <h1 class="p-top__title">Top</h1>
       <p class="p-top__msg">{{ $setting->description }}</p>
+      <p class="p-top__copyright">
+        <img class="p-top__icon" src="{{ Vite::asset('resources/images/icon.png') }}" width="24" height="24" alt="">
+        <small>&copy; {{ date('Y') }} {{ config('app.name') }}</small>
+      </p>
     </section>
   </div>
 @endsection

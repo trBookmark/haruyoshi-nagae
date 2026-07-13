@@ -1,0 +1,13 @@
+// パンくずリスト（旧 p-breadcrumblist の骨格。階層リンクは各ページ実装時に拡張）
+.c-breadcrumb {
+  display: flex;
+  align-items: center;
+  height: var(--breadcrumb-height);
+  font-family: var(--font-family-system);
+
+  &__current {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-base);
+    letter-spacing: 0.1em;
+  }
+}

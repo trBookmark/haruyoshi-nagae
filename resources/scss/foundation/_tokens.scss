@@ -37,16 +37,22 @@
   --content-max-height: 700px; // 旧 $body-max-height
   --header-height: 4rem;
   --footer-height: 4rem;
+  --breadcrumb-height: 4rem; // 旧 $breadcrumb-height
   --drawer-width: 30rem;
   --top-text-min-width: 22rem; // トップ横画面時の文章カラム最小幅
 
-  // 影（旧 shadow mixin）
+  // 角丸（旧 $border-radius）
+  --radius: 3px;
+
+  // 影（旧 shadow / hover-shadow mixin）
   --shadow-box: -2px -2px 10px #fff, 2px 2px 10px rgba(10, 10, 10, 0.25);
+  --shadow-box-hover: -2px -2px 5px #fff, 2px 2px 5px rgba(10, 10, 10, 0.25);
 
   // 重なり順（ドロワー本体は <dialog> の top-layer 表示のため z-index 不要）
   --z-drawer: 100; // 開閉ボタン用
 
   // その他
+  --transition-fast: 0.2s ease;
   --transition-move: 0.6s ease-out;
   --transition-drawer: 0.7s ease;
 }

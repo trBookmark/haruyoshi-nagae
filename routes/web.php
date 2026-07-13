@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 
 // Gallery（カテゴリ一覧）
-// Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 
 // カテゴリ別画像一覧
 // Route::get('/gallery/{category:name}', [GalleryController::class, 'show'])->name('gallery.show');

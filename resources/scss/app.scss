@@ -8,6 +8,9 @@
 @use 'layout/footer';
 @use 'layout/drawer';
 
+@use 'components/breadcrumb';
+
 @use 'pages/top';
+@use 'pages/gallery';
 
 // components / pages は各機能ブランチでここに追記

@@ -1,0 +1,112 @@
+// Gallery カテゴリ一覧（旧 p-g-card 踏襲）
+// 全カードが1画面に収まるよう、カード寸法を自身の実寸（cqw / cqh）とカード数から算出
+// --count は Blade がカテゴリ数を設定（デフォルト6）
+.p-gallery {
+  --count: 6;
+  --text-col: 13.5rem;  // 縦画面の文字カラム幅（12rem + gap 1.5rem）
+  --text-rows: 4.5rem;  // 横画面の文字2行分の高さ
+
+  // 縦画面：横長カード（左に正方形サムネ）を縦に並べる
+  // カード寸法＝「高さ等分」と「文字カラムを除いた幅」の小さい方
+  --card-size: min(
+    calc((100cqh - var(--space-sm) * (var(--count) - 1)) / var(--count)),
+    calc(100cqw - var(--text-col))
+  );
+
+  container-type: size; // 自身の実寸を 100cqw / 100cqh として提供
+  display: grid;
+  place-content: center;
+  gap: var(--space-sm);
+  height: calc(100% - var(--breadcrumb-height));
+  // cqh はコンテンツボックス基準のため、padding を増やすとカードは自動で縮んで収まる
+  padding-block-end: var(--space-md);
+
+  &__card {
+    height: var(--card-size);
+    background-color: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-box);
+    transition: box-shadow var(--transition-fast);
+
+    @media (hover: hover) {
+      &:hover {
+        box-shadow: var(--shadow-box-hover);
+      }
+    }
+  }
+
+  &__link {
+    display: grid;
+    grid-template:
+      'img title' 1fr
+      'img info' 1fr
+      / var(--card-size) minmax(12rem, auto); // 12rem = 最長「ミュージックビデオ」
+    column-gap: 1.5rem;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--radius);
+  }
+
+  &__figure {
+    grid-area: img;
+  }
+
+  &__img {
+    width: var(--card-size);
+    height: var(--card-size);
+    object-fit: cover;
+  }
+
+  &__title {
+    grid-area: title;
+    align-self: end; // 下揃え
+    min-height: 2rem;
+    font-size: 1rem;
+    font-weight: var(--font-weight-base);
+    white-space: nowrap;
+  }
+
+  &__info {
+    grid-area: info;
+    align-self: start; // 上揃え
+    min-height: 2rem;
+    margin: 0;
+    white-space: nowrap;
+    text-align: left;
+  }
+}
+
+// 横画面：縦長カード（上に正方形サムネ、下に英語名・日本語名/件数）を横に並べる
+// カード寸法＝「幅等分」と「文字行を除いた高さ」の小さい方
+@media (orientation: landscape) {
+  .p-gallery {
+    --card-size: min(
+      calc((100cqw - var(--space-sm) * (var(--count) - 1)) / var(--count)),
+      calc(100cqh - var(--text-rows))
+    );
+
+    grid-auto-flow: column;
+
+    &__card {
+      width: var(--card-size);
+      height: auto;
+    }
+
+    &__link {
+      grid-template:
+        'img' var(--card-size)
+        'title' auto
+        'info' auto
+        / var(--card-size);
+      column-gap: 0;
+    }
+
+    &__title {
+      padding-inline: var(--space-sm);
+    }
+
+    &__info {
+      padding-inline: var(--space-sm);
+    }
+  }
+}

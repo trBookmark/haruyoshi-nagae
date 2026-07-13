@@ -1,7 +1,7 @@
 // トップページ（旧 l-top）
-// 画像は常に「枠の短辺いっぱいの正方形」= min(100cqw, 100cqh) で宣言する
+// 画像は常に「枠の短辺いっぱいの正方形」= min(100cqw, 100cqh) で宣言
 
-// トップページは画像を画面幅いっぱいに出すため main の左右余白を外す
+// トップページは画像を画面幅いっぱいに出すため main の左右余白を打ち消す
 body:has(.p-top) .l-main {
   padding-inline: 0;
 }
@@ -47,6 +47,19 @@ body:has(.p-top) .l-main {
   &__msg {
     text-align: center; // _base の p { text-align: justify } を上書き（継承では負けるため明示）
     white-space: pre-line;
+  }
+
+  // アイコン＋©（旧トップの c-copyright--top 踏襲）
+  &__copyright {
+    margin-top: var(--space-sm);
+    font-family: var(--font-family-handwriting);
+    text-align: center;
+  }
+
+  &__icon {
+    display: inline-block; // リセットの display: block を打ち消してテキストと並べる
+    margin-right: var(--space-sm);
+    vertical-align: middle;
   }
 }
 

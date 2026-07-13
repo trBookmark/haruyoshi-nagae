@@ -1,4 +1,4 @@
-// フッター：ページナビ＋コピーライト（旧 p-footer / c-copyright）
+// フッター：ページナビのみの1段（旧 p-footer、© はトップページに表示）
 .l-footer {
   grid-area: footer;
 
@@ -30,18 +30,5 @@
     &:active {
       font-weight: 500;
     }
-  }
-
-  &__copyright {
-    height: var(--footer-height);
-    font-family: var(--font-family-handwriting);
-    line-height: var(--footer-height);
-    text-align: center;
-  }
-
-  &__copyright-icon {
-    display: inline-block;
-    margin-right: var(--space-sm);
-    vertical-align: middle;
   }
 }

@@ -1,6 +1,6 @@
-{{-- フッター：ページナビ＋コピーライト --}}
+{{-- フッター：ページナビのみ（© はトップページに表示） --}}
 <footer class="l-footer">
-  <nav aria-label="メインナビゲーション">
+  <nav class="l-footer__nav" aria-label="メインナビゲーション">
     <ul class="l-footer__nav-list">
       @foreach ([
         ['route' => 'gallery.index', 'pattern' => 'gallery.*', 'label' => 'Gallery'],
@@ -16,8 +16,4 @@
       @endforeach
     </ul>
   </nav>
-  <p class="l-footer__copyright">
-    <img class="l-footer__copyright-icon" src="{{ Vite::asset('resources/images/icon.png') }}" width="24" height="24" alt="">
-    <small>&copy; {{ date('Y') }} {{ config('app.name') }}</small>
-  </p>
 </footer>

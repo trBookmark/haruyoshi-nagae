@@ -1,0 +1,22 @@
+// ヘッダー：筆記体のサイトタイトルのみ（旧 p-header）
+.l-header {
+  &__site-name {
+    height: var(--header-height);
+    font-family: var(--font-family-handwriting);
+    font-size: var(--font-size-site-title);
+    font-weight: 400;
+    line-height: var(--header-height);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  &__link {
+    display: block;
+  }
+
+  @media (hover: hover) {
+    &__link:hover {
+      font-weight: 700;
+    }
+  }
+}

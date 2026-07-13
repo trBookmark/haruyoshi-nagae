@@ -1,0 +1,43 @@
+// デザイントークン（オフホワイト基調＋赤茶リンク＋明朝）
+// ここ以外での色・余白等の直値指定は原則禁止
+:root {
+  // 色
+  --color-bg: #f9f9f9;
+  --color-surface: #fcfcfc;
+  --color-text: #211;
+  --color-link: #763c3a;
+  --color-link-active: #480e0d;
+  --color-border: #deddd2;
+  --color-shadow: rgba(186, 183, 163, 0.2);
+  --color-overlay: rgba(10, 10, 10, 0.8);
+
+  // フォント
+  --font-family-base: 'Noto Serif SC', '游明朝', YuMincho, 'ヒラギノ明朝 ProN W3', 'Hiragino Mincho ProN', 'HG明朝E', 'ＭＳ Ｐ明朝', 'ＭＳ 明朝', serif;
+  --font-family-handwriting: 'Italianno', 'Apple Chancery', 'Snell Roundhand', 'URW Chancery L', '游明朝', YuMincho, 'ヒラギノ明朝 ProN W3', 'Hiragino Mincho ProN', 'HG明朝E', 'ＭＳ Ｐ明朝', 'ＭＳ 明朝', cursive;
+  --font-family-system: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-weight-base: 200;
+  --font-size-sm: 0.875rem;
+  --font-size-lg: 1.25rem;
+  --font-size-site-title: 2.5rem;
+  --line-height-base: 1.618;
+
+  // 余白
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+
+  // レイアウト
+  --content-max-width: 1400px;
+  --header-height: 4rem;
+  --footer-height: 4rem;
+  --drawer-width: 30rem;
+
+  // 重なり順（ドロワー本体は <dialog> の top-layer 表示のため z-index 不要）
+  --z-drawer: 100; // 開閉ボタン用
+
+  // その他
+  --transition-move: 0.6s ease-out;
+  --transition-drawer: 0.7s ease;
+}

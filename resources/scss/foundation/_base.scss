@@ -1,0 +1,64 @@
+// ベーススタイル
+
+// ページ遷移をクロスフェードに（View Transitions、非対応ブラウザは通常遷移）
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+// 可変 rem：小画面では vmin 基準で全体が縮む（旧サイトの挙動を clamp() で再現）
+:root {
+  font-size: 16px; // clamp() 非対応ブラウザ用フォールバック
+  font-size: clamp(10px, 3.125vmin, 16px);
+}
+
+html {
+  // スクロールバー分の幅を常に予約（レイアウトシフト防止）
+  scrollbar-gutter: stable;
+  // スクロール端のバウンス・スクロール連鎖を抑止（アプリ風）
+  overscroll-behavior-y: none;
+  background-color: var(--color-bg);
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+
+  &:visited,
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--color-link-active);
+  }
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}

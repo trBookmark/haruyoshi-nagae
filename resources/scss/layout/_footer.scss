@@ -1,0 +1,39 @@
+// フッター：ページナビ＋コピーライト（旧 p-footer / c-copyright）
+.l-footer {
+  &__nav-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--footer-height);
+    font-family: var(--font-family-system);
+  }
+
+  &__nav-item {
+    flex: 0 1 5.5rem;
+    text-align: center;
+
+    // 現在ページ（アンダーライン風シャドウ）
+    &.is-current {
+      font-weight: 500;
+      box-shadow: inset 0 -5px 3px -4px var(--color-link-active);
+    }
+  }
+
+  &__nav-link {
+    display: block;
+    line-height: var(--footer-height);
+
+    &:hover,
+    &:focus,
+    &:active {
+      font-weight: 500;
+    }
+  }
+
+  &__copyright {
+    height: var(--footer-height);
+    font-family: var(--font-family-handwriting);
+    line-height: var(--footer-height);
+    text-align: center;
+  }
+}

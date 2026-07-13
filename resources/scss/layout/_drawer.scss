@@ -1,0 +1,67 @@
+// 開閉ドロワー（<dialog> ベース、見た目は旧 p-aside）
+// フォーカストラップ・ESC で閉じるはネイティブ動作。menu.js は showModal() / close() を呼ぶだけ
+.l-drawer {
+  position: fixed;
+  inset: 0 0 0 auto; // 右端に配置
+  width: min(var(--drawer-width), 100vw);
+  max-width: none;
+  max-height: none;
+  height: 100dvh;
+  // padding は __inner 側に持たせる（backdrop クリック判定を成立させるため）
+  padding: 0;
+  overflow-y: auto;
+  background-color: var(--color-overlay);
+  border: none;
+  transform: translateX(100%);
+  transition:
+    transform var(--transition-drawer),
+    display var(--transition-drawer) allow-discrete,
+    overlay var(--transition-drawer) allow-discrete;
+
+  &[open] {
+    transform: translateX(0);
+
+    // 開くアニメーションの開始状態
+    @starting-style {
+      transform: translateX(100%);
+    }
+  }
+
+  // パネル自体が半透明黒のため、背景はこれ以上暗くしない
+  &::backdrop {
+    background: none;
+  }
+}
+
+// ドロワー開閉ボタン（ハンバーガー）
+.l-drawer-toggle {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: var(--z-drawer);
+  width: var(--header-height);
+  height: var(--header-height);
+
+  &__bar {
+    position: absolute;
+    left: 1.3rem;
+    display: inline-block;
+    width: calc(var(--header-height) - 2.6rem);
+    height: 2px;
+    background-color: var(--color-link);
+    border-radius: 2px;
+    transition: all 0.4s;
+
+    &:nth-of-type(1) {
+      top: 1.4rem;
+    }
+
+    &:nth-of-type(2) {
+      top: calc(var(--header-height) / 2);
+    }
+
+    &:nth-of-type(3) {
+      bottom: 1.2rem;
+    }
+  }
+}

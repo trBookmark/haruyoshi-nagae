@@ -1,0 +1,10 @@
+@use 'sass:map';
+@use 'variables' as v;
+
+// min-width メディアクエリ（モバイルファースト）
+// 使用例: @include mq('md') { ... }
+@mixin mq($size) {
+  @media (min-width: map.get(v.$breakpoints, $size)) {
+    @content;
+  }
+}

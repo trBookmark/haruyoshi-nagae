@@ -41,10 +41,18 @@ class PlaylistForm
             ->searchable()
             ->placeholder('選択してください'),
 
-          TextInput::make('name')
+          TextInput::make('name_ja')
             ->label('サブカテゴリ名')
             ->required()
             ->maxLength(255),
+
+          TextInput::make('name')
+            ->label('サブカテゴリ名（URL用英語名）')
+            ->helperText('半角英小文字で始める（英小文字・数字・ハイフンのみ）。プレイリストページの URL の一部になります（例: musicvideo）')
+            ->required()
+            ->maxLength(190)
+            ->regex('/^[a-z][a-z0-9-]*$/')
+            ->unique(table: 'playlists', column: 'name', ignoreRecord: true),
 
           TextInput::make('yt_playlist_id')
             ->label('YouTube プレイリスト ID')

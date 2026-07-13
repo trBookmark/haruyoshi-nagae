@@ -20,6 +20,7 @@ class Playlist extends Model implements Sortable
   protected $fillable = [
     'category_id',
     'name',
+    'name_ja',
     'yt_playlist_id',
     'image_id',
     'sort_order',

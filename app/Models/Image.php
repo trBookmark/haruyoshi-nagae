@@ -172,7 +172,7 @@ class Image extends Model
     }
 
     if ($playlist = $this->usedByPlaylist()->first()) {
-      return "プレイリスト「{$playlist->name}」のカバー画像として使用中";
+      return "プレイリスト「{$playlist->name_ja}」のカバー画像として使用中";
     }
 
     if ($post = $this->usedByPost()->first()) {

@@ -40,8 +40,14 @@ class PlaylistsTable
           ->width(80)
           ->height(60),
 
-        TextColumn::make('name')
+        TextColumn::make('name_ja')
           ->label('サブカテゴリ名')
+          ->searchable()
+          ->sortable(),
+
+        TextColumn::make('name')
+          ->label('URL用英語名')
+          ->placeholder('未入力')
           ->searchable()
           ->sortable(),
 

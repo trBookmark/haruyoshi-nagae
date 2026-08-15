@@ -2,29 +2,40 @@
 // フォーカストラップ・ESC で閉じるはネイティブ動作。menu.js は showModal() / close() を呼ぶだけ
 .l-drawer {
   position: fixed;
-  inset: 0 0 0 auto; // 右端に配置
-  width: min(var(--drawer-width), 100vw);
+  // 通常時は画面右端いっぱい、アプリ風ボックス時はボックス内右端に収まる
+  // （--box-offset-* / --viewport-* はトークンで切り替わるため media query 不要）
+  inset: var(--box-offset-y) var(--box-offset-x) auto auto;
+  width: min(var(--drawer-width), var(--viewport-w));
   max-width: none;
   max-height: none;
-  height: 100dvh;
+  height: var(--viewport-h);
   // padding は __inner 側に持たせる（backdrop クリック判定を成立させるため）
   padding: 0;
   overflow-y: auto;
   background-color: var(--color-overlay);
   border: none;
-  transform: translateX(100%);
+  // 右端起点のワイプで開閉（幅を 0 → 最大に見せる）
+  // width を transition すると中身が再レイアウトされ揺れるため clip-path を使う
+  clip-path: inset(0 0 0 100%);
   transition:
-    transform var(--transition-drawer),
+    clip-path var(--transition-drawer),
     display var(--transition-drawer) allow-discrete,
     overlay var(--transition-drawer) allow-discrete;
 
   &[open] {
-    transform: translateX(0);
+    clip-path: inset(0);
 
     // 開くアニメーションの開始状態
     @starting-style {
-      transform: translateX(100%);
+      clip-path: inset(0 0 0 100%);
     }
+  }
+
+  // Safari は showModal() でダイアログ自身にフォーカスを移すため、共通の :focus-visible 枠が外周に出る
+  // パネル自体の枠は情報量がないため抑止（内部の操作要素のフォーカス表示は維持）
+  &:focus,
+  &:focus-visible {
+    outline: none;
   }
 
   // パネル自体が半透明黒のため、背景はこれ以上暗くしない
@@ -42,6 +53,13 @@
   z-index: var(--z-drawer);
   width: var(--header-height);
   height: var(--header-height);
+
+  // ESC でドロワーを閉じるとフォーカスがこのボタンへ戻る（ネイティブ動作）
+  // リングはボタンの内側に描き、画面・ボックスの角で見切れないようにする
+  &:focus-visible {
+    border-radius: var(--radius);
+    outline-offset: -2px;
+  }
 
   &__bar {
     position: absolute;

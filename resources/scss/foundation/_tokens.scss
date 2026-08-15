@@ -44,6 +44,10 @@
   --drawer-width: 30rem;
   --top-text-min-width: 22rem; // トップ横画面時の文章カラム最小幅
 
+  // アプリ風ボックス表示時のボックス左上オフセット（通常時は 0。_base.scss の media query で上書き）
+  --box-offset-x: 0px;
+  --box-offset-y: 0px;
+
   // 角丸（旧 $border-radius）
   --radius: 3px;
 

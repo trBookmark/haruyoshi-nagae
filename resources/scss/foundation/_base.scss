@@ -75,6 +75,9 @@ p {
   :root {
     --viewport-w: var(--content-max-width);
     --viewport-h: var(--content-max-height);
+    // top layer の要素（<dialog>）はビューポート基準で配置されるため、ボックスの位置を渡す
+    --box-offset-x: calc((100vw - var(--content-max-width)) / 2);
+    --box-offset-y: calc((100dvh - var(--content-max-height)) / 2);
   }
 
   html {

@@ -5,6 +5,18 @@
   height: var(--breadcrumb-height);
   font-family: var(--font-family-system);
 
+  &__list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+  }
+
+  &__item::after {
+    margin-inline: var(--space-sm);
+    color: var(--color-border);
+    content: '>';
+  }
+
   &__current {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-base);

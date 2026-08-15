@@ -9,8 +9,12 @@
 @use 'layout/drawer';
 
 @use 'components/breadcrumb';
+@use 'components/reveal';
+
+@use 'utility/image-align';
 
 @use 'pages/top';
 @use 'pages/gallery';
+@use 'pages/category';
 
 // components / pages は各機能ブランチでここに追記

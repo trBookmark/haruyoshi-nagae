@@ -1,0 +1,15 @@
+// スクロール出現演出（resources/js/reveal.js と対）
+// .is-waiting は JS が付与してから監視を開始
+// JS 無効環境では最初から表示される
+.c-reveal {
+  &.is-waiting {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+
+  &.is-revealed {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--transition-move), transform var(--transition-move);
+  }
+}

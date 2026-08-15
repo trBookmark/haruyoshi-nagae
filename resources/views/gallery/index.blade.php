@@ -18,13 +18,17 @@
   <div class="p-gallery" style="--count: {{ $categories->count() }}">
     @foreach ($categories as $category)
       @php
-        // リンク先は model_type で分岐（POST=ブログ一覧、それ以外=カテゴリページ）
+        // リンク先は model_type で分岐（IMAGE=カテゴリ別画像一覧、POST=ブログ一覧）
+        // プレイリスト専用カテゴリ（null）は手順7（gallery.show のサブカテゴリ分岐実装）でリンク化する
         // 対象ルートが未実装の間は Route::has が偽になりリンクなしで表示される
         $count = $category->itemCount();
-        $routeName = $category->model_type === App\Enums\ModelType::POST ? 'blog.index' : 'gallery.show';
         $url = null;
-        if ($count > 0 && Route::has($routeName)) {
-          $url = $routeName === 'blog.index' ? route('blog.index') : route('gallery.show', $category);
+        if ($count > 0) {
+          $url = match ($category->model_type) {
+            App\Enums\ModelType::IMAGE => Route::has('gallery.show') ? route('gallery.show', $category) : null,
+            App\Enums\ModelType::POST  => Route::has('blog.index') ? route('blog.index') : null,
+            null                       => null,
+          };
         }
       @endphp
       <section class="p-gallery__card">

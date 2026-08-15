@@ -69,7 +69,7 @@ p {
   outline-offset: 2px;
 }
 
-// アプリ風ボックス：大画面ではサイト全体を中央のカードとして表示（旧 big_holizonal 踏襲）
+// アプリ風ボックス：大画面ではサイト全体を中央のカードとして表示（旧 big_holizonal）
 // ビューポート基準値をボックス寸法に差し替えることで、ページ側の計算式はそのまま機能する
 @media (min-width: 1400px) and (min-height: 700px) {
   :root {

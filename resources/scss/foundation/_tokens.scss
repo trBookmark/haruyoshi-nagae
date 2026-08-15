@@ -10,6 +10,8 @@
   --color-border: #deddd2;
   --color-shadow: rgba(186, 183, 163, 0.2);
   --color-overlay: rgba(10, 10, 10, 0.8);
+  --color-text-inverse: #fcfcfc; // 濃色面上の文字（画像ホバー演出等）
+  --color-scrim: rgba(10, 10, 10, 0.25); // 文字背後の半透明パネル（旧 $boxshadow）
 
   // フォント
   --font-family-base: 'Noto Serif SC', '游明朝', YuMincho, 'ヒラギノ明朝 ProN W3', 'Hiragino Mincho ProN', 'HG明朝E', 'ＭＳ Ｐ明朝', 'ＭＳ 明朝', serif;
@@ -17,6 +19,7 @@
   --font-family-system: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-weight-base: 200;
   --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
   --font-size-lg: 1.25rem;
   --font-size-site-title: 2.5rem;
   --line-height-base: 1.618;
@@ -28,7 +31,7 @@
   --space-lg: 2rem;
   --space-xl: 4rem;
 
-  // ビューポート基準値（アプリ風ボックス表示時は _base.scss の media query で上書きされる）
+  // ビューポート基準値（アプリ風ボックス表示時は _base.scss の media query で上書き）
   --viewport-w: 100vw;
   --viewport-h: 100dvh;
 
@@ -48,7 +51,7 @@
   --shadow-box: -2px -2px 10px #fff, 2px 2px 10px rgba(10, 10, 10, 0.25);
   --shadow-box-hover: -2px -2px 5px #fff, 2px 2px 5px rgba(10, 10, 10, 0.25);
 
-  // 重なり順（ドロワー本体は <dialog> の top-layer 表示のため z-index 不要）
+  // 重なり順（ドロワー本体は <dialog> の top-layer、z-index 不要）
   --z-drawer: 100; // 開閉ボタン用
 
   // その他

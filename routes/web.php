@@ -21,7 +21,7 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
 
 // カテゴリ別画像一覧
-// Route::get('/gallery/{category:name}', [GalleryController::class, 'show'])->name('gallery.show');
+Route::get('/gallery/{category:name}', [GalleryController::class, 'show'])->name('gallery.show');
 
 // 画像個別ページとプレイリストページは URL が同型のため、制約で互いに排他にする：
 // 画像＝数値のみ、プレイリスト＝英小文字始まり（playlists.name のバリデーションで形式を強制）

@@ -1,9 +1,12 @@
-// パンくずリスト（旧 p-breadcrumblist の骨格。階層リンクは各ページ実装時に拡張）
+// パンくずリスト（旧 p-breadcrumblist の骨格）
+// フォントサイズ・色はコンポーネント全体で一度だけ指定し、各部は継承させる
 .c-breadcrumb {
   display: flex;
   align-items: center;
   height: var(--breadcrumb-height);
   font-family: var(--font-family-system);
+  font-size: var(--font-size-md);
+  color: var(--color-link);
 
   &__list {
     display: flex;
@@ -13,13 +16,12 @@
 
   &__item::after {
     margin-inline: var(--space-sm);
-    color: var(--color-border);
     content: '>';
   }
 
+  // 現在位置は太字で区別する
   &__current {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-base);
-    letter-spacing: 0.1em;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.05em;
   }
 }

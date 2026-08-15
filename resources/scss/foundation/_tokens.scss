@@ -18,6 +18,8 @@
   --font-family-handwriting: 'Italianno', 'Apple Chancery', 'Snell Roundhand', 'URW Chancery L', '游明朝', YuMincho, 'ヒラギノ明朝 ProN W3', 'Hiragino Mincho ProN', 'HG明朝E', 'ＭＳ Ｐ明朝', 'ＭＳ 明朝', cursive;
   --font-family-system: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-weight-base: 200;
+  --font-weight-medium: 500; // システムフォント用（本文フォントには無いウェイト）
+  --font-weight-bold: 600;   // 本文フォントは 200 / 600 のみ読み込み（layouts/app.blade.php）
   --font-size-sm: 0.875rem;
   --font-size-md: 1rem;
   --font-size-lg: 1.25rem;

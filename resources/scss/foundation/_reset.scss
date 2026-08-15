@@ -9,6 +9,17 @@
   margin: 0;
 }
 
+// 見出しはブラウザ既定のサイズ・太さを持たない（各コンポーネントで明示する）
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }

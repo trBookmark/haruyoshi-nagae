@@ -56,7 +56,7 @@ a {
 
 b,
 strong {
-  font-weight: 600;
+  font-weight: var(--font-weight-bold);
 }
 
 p {

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,8 +28,12 @@ Route::get('/gallery/{category:name}', [GalleryController::class, 'show'])->name
 // 画像＝数値のみ、プレイリスト＝英小文字始まり（playlists.name のバリデーションで形式を強制）
 
 // 画像個別ページ
-// Route::get('/gallery/{category:name}/{image}', [ImageController::class, 'show'])
-//   ->whereNumber('image')->name('images.show');
+// scopeBindings(): {image} を $category->images() 経由で解決し、
+// カテゴリに属さない画像 ID を 404 にする（同一画像が複数 URL で見えるのを防ぐ）
+Route::get('/gallery/{category:name}/{image}', [ImageController::class, 'show'])
+  ->whereNumber('image')
+  ->scopeBindings()
+  ->name('images.show');
 
 // プレイリストページ（サブカテゴリ・YouTube 埋め込み。着手時に playlists の name 分割が必要）
 // Route::get('/gallery/{category:name}/{playlist:name}', [PlaylistController::class, 'show'])

@@ -45,6 +45,7 @@
   --breadcrumb-height: 4rem; // 旧 $breadcrumb-height
   --drawer-width: 30rem;
   --top-text-min-width: 22rem; // トップ横画面時の文章カラム最小幅
+  --image-meta-min-width: 19rem; // 個別ページ横画面時の右カラム最小幅（667×375 で画像枠が正方形になる上限は 20.4rem）
 
   // アプリ風ボックス表示時のボックス左上オフセット（通常時は 0。_base.scss の media query で上書き）
   --box-offset-x: 0px;

@@ -48,7 +48,7 @@
     transition: opacity var(--transition-fast);
   }
 
-  // 枠線演出（上下線・左右線が伸びて現れる。旧 caption::before/::after）
+  // 枠線演出（上下線・左右線が伸びて現れる）
   &__caption::before,
   &__caption::after {
     position: absolute;
@@ -78,14 +78,25 @@
   &__tags {
     position: relative;
     padding-block: var(--space-xs);
+    // 文字がはみ出さないよう、::before のスクリム
+    // （padding-inline ＋ background-clip: content-box でさらに内側に描かれる）と左右の内寸を揃える
+    padding-inline: var(--space-sm);
     opacity: 0;
     transform: translateY(1rem);
     transition: opacity var(--transition-fast), transform var(--transition-fast);
   }
 
+  // 長いタイトルがカードの枠線からはみ出さないように
+  // 英数字の連続も折り返すため overflow-wrap を明示
+  // 縦方向は2行で打ち切る（カードは正方形固定で高さに余裕がない）
   &__title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
     font-size: var(--font-size-md);
     font-weight: var(--font-weight-base);
+    overflow-wrap: anywhere;
   }
 
   &__year,
@@ -103,7 +114,7 @@
   }
 }
 
-// ホバー演出（旧サイト同様：赤茶グラデーション＋画像ズーム、枠線→文字の順に段階表示）
+// hover演出（赤茶グラデーション＋画像ズーム、枠線→文字の順に段階表示）
 @media (hover: hover) {
   .p-category__card:hover {
     .p-category__img {

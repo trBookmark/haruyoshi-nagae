@@ -58,4 +58,35 @@ class ImageFactory extends Factory
       'mime_type'         => 'image/gif',
     ]);
   }
+
+  /**
+   * small
+   * 長辺が thumb の基準値（config: image.resize.thumb）より小さい状態
+   * リサイズは拡大なしのため、全サイズが原寸のまま保存される
+   * variantWidth() / srcset() が原寸を返し、記述子が1件にまとまることの検証用
+   *
+   * @return static
+   */
+  public function small(): static
+  {
+    return $this->state(fn (): array => [
+      'width'  => 300,
+      'height' => 200,
+    ]);
+  }
+
+  /**
+   * oversized
+   * 長辺が large の基準値（config: image.resize.large）より大きい状態
+   * 全サイズがリサイズされる。variantWidth() の縮小計算の検証用
+   *
+   * @return static
+   */
+  public function oversized(): static
+  {
+    return $this->state(fn (): array => [
+      'width'  => 3000,
+      'height' => 2000,
+    ]);
+  }
 }

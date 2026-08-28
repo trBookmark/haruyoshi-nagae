@@ -46,8 +46,8 @@ class GalleryController extends Controller
 
     $images = $category->images()
       ->with('tags')
-      ->where('is_active', true)
-      ->orderBy('sort_order')
+      ->active()
+      ->orderedForGallery()
       ->get();
 
     abort_if($images->isEmpty(), 404);

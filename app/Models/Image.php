@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ThumbnailAlign;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -127,6 +128,61 @@ class Image extends Model
   }
 
   /**
+   * variantWidth
+   * 指定サイズの実ファイル幅を返す
+   * リサイズは長辺基準・縦横比維持・拡大なし
+   * 長辺が基準値以下の画像は原寸のまま
+   * GIF アニメはリサイズしない（常に原寸）
+   *
+   * @param  string   $size large|medium|thumb
+   * @return int|null       幅（px）。width/height が未記録の場合は null
+   */
+  public function variantWidth(string $size): ?int
+  {
+    if ($this->width === null || $this->height === null) {
+      return null;
+    }
+
+    $base = config('image.resize.' . $size);
+
+    if ($this->isAnimatedGif() || $base === null) {
+      return $this->width;
+    }
+
+    $longest = max($this->width, $this->height);
+
+    return $longest <= $base
+      ? $this->width
+      : (int) round($this->width * $base / $longest);
+  }
+
+  /**
+   * srcset
+   * 実ファイル幅にもとづく srcset 属性値を組み立てる
+   * config の基準値をそのまま記述子にすると、
+   * 拡大なし方針により基準値より小さいまま保存された画像で記述子が実態とずれ、
+   * ブラウザの密度補正によって表示サイズとリソース選択が狂う
+   * 同じ幅になったサイズは重複するため1件にまとめる
+   *
+   * @param  string[] $sizes large|medium|thumb を小さい順に指定
+   * @return string          "url 400w, url 600w" 形式。幅が不明な場合は空文字
+   */
+  public function srcset(array $sizes = ['medium', 'large']): string
+  {
+    $entries = [];
+
+    foreach ($sizes as $size) {
+      $width = $this->variantWidth($size);
+
+      if ($width !== null && ! isset($entries[$width])) {
+        $entries[$width] = $this->imageUrl($size) . ' ' . $width . 'w';
+      }
+    }
+
+    return implode(', ', $entries);
+  }
+
+  /**
    * isAnimatedGif
    * GIF アニメ判定
    *
@@ -135,6 +191,35 @@ class Image extends Model
   public function isAnimatedGif(): bool
   {
     return $this->mime_type === 'image/gif';
+  }
+
+  // ──────────── Scope ────────────
+
+  /**
+   * scopeActive
+   * フロントに公開する画像（is_active=true）に絞り込む
+   * 公開条件をここに集約し、呼び出し側から生の where を排除する
+   *
+   * @param  \Illuminate\Database\Eloquent\Builder $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeActive(Builder $query): Builder
+  {
+    return $query->where('is_active', true);
+  }
+
+  /**
+   * scopeOrderedForGallery
+   * フロントの表示順（sort_order 昇順、同値は id 昇順）を適用
+   * sort_order は default 0 で重複しうるため、id を第2キーにして順序を一意に確定する
+   * 一覧ページと個別ページの前後ナビで並びを一致させるため、定義をここに集約
+   *
+   * @param  \Illuminate\Database\Eloquent\Builder $query
+   * @return \Illuminate\Database\Eloquent\Builder
+   */
+  public function scopeOrderedForGallery(Builder $query): Builder
+  {
+    return $query->orderBy('sort_order')->orderBy('id');
   }
 
   // ──────────── Helper ────────────

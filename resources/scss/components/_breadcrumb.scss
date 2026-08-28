@@ -3,13 +3,18 @@
 .c-breadcrumb {
   display: flex;
   align-items: center;
+  // grid／flex項目の min-width 既定値は auto（min-content）
+  // これを 0 にしないとコンテナ自体が内容分まで広がり、内側の省略記号が働かない
+  min-width: 0;
   height: var(--breadcrumb-height);
   font-family: var(--font-family-system);
   font-size: var(--font-size-md);
   color: var(--color-link);
 
+  // 階層リンクは縮めず、省略は現在位置（作品タイトル）側で吸収
   &__list {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     list-style: none;
   }
@@ -19,9 +24,16 @@
     content: '>';
   }
 
-  // 現在位置は太字で区別する
+  // 現在位置は太字で区別
+  // 長い作品タイトルは1行に収めて省略
+  // min-width: 0 必須：flex 項目は既定で min-content 未満に縮まないため
+  // （これがないと固定高を突き破ってレイアウトが崩れる）
   &__current {
+    min-width: 0;
+    overflow: hidden;
     font-weight: var(--font-weight-medium);
     letter-spacing: 0.05em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

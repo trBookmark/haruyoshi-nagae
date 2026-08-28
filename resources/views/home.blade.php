@@ -14,7 +14,7 @@
           <a class="p-top__feature-link" href="{{ route('gallery.index') }}" aria-label="ギャラリーへ移動">
             <img class="p-top__img"
               src="{{ $setting->image->imageUrl('medium') }}"
-              srcset="{{ $setting->image->imageUrl('medium') }} 600w, {{ $setting->image->imageUrl('large') }} 1920w"
+              srcset="{{ $setting->image->srcset(['medium', 'large']) }}"
               sizes="100vw"
               alt="{{ $setting->image_alt ?? '' }}"
               fetchpriority="high"
@@ -23,7 +23,7 @@
         @else
           <img class="p-top__img"
             src="{{ $setting->image->imageUrl('medium') }}"
-            srcset="{{ $setting->image->imageUrl('medium') }} 600w, {{ $setting->image->imageUrl('large') }} 1920w"
+            srcset="{{ $setting->image->srcset(['medium', 'large']) }}"
             sizes="100vw"
             alt="{{ $setting->image_alt ?? '' }}"
             fetchpriority="high"

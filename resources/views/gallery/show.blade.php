@@ -19,7 +19,6 @@
       @php
         // タイトル未入力時のフォールバック表示
         $title = $image->title ?: 'No. ' . $image->id;
-        // 個別ページ（手順5）が未実装の間は Route::has が偽になりリンクなしで表示される
         $url = Route::has('images.show') ? route('images.show', [$category, $image]) : null;
       @endphp
       <a class="p-category__card c-reveal js-reveal"
@@ -35,7 +34,7 @@
         @else
           <img class="p-category__img u-img-align--{{ $image->thumbnail_align->value }}"
             src="{{ $image->imageUrl('medium') }}"
-            srcset="{{ $image->imageUrl('thumb') }} 400w, {{ $image->imageUrl('medium') }} 600w"
+            srcset="{{ $image->srcset(['thumb', 'medium']) }}"
             sizes="(max-width: 559px) 50vw, (max-width: 899px) 33vw, 25vw"
             alt="{{ $title }}"
             loading="lazy"

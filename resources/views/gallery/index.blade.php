@@ -39,7 +39,7 @@
             <img class="p-gallery__img"
               src="{{ $cover?->imageUrl('medium') ?? App\Models\Image::noImageUrl('medium') }}"
               @if ($cover)
-                srcset="{{ $cover->imageUrl('thumb') }} 400w, {{ $cover->imageUrl('medium') }} 600w"
+                srcset="{{ $cover->srcset(['thumb', 'medium']) }}"
                 sizes="(max-width: 767px) 100vw, 320px"
               @endif
               alt="{{ $category->name_ja }}"

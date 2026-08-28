@@ -1,0 +1,211 @@
+// 画像個別ページ（p-image）
+// 縦画面でも固定フレームのgrid、画像可変、captionと前後ナビを下端固定
+// 画像の高さやcaptionの長さで前後ナビの位置がずれないように
+// 方針：1画面収容・スクロールは内部のみ
+body:has(.p-image) {
+  // .l-main の padding-inline を打ち消したぶんを各要素へ付け直すための共通値
+  --image-inline-padding: clamp(var(--space-md), 4vw, var(--space-xl));
+  // 縦の余白も画面の高さに追従させる
+  // （rem は下限 10px、小さい画面では --space-lg が相対的に間延びする）
+  --image-block-padding: clamp(var(--space-sm), 2dvh, var(--space-lg));
+  // 説明欄が伸びて画像（1fr）を潰さないための上限
+  // 縦画面画像主体なので控えめに（横長では下で緩める）
+  --image-meta-max-height: calc(var(--viewport-h) * 0.35);
+}
+
+body:has(.p-image) .l-main {
+  display: grid;
+  grid-template-rows: auto 1fr; // パンくず / 作品
+  padding-inline: 0; // 画像を画面端まで広げ、余白は各要素へ付け直す
+}
+
+body:has(.p-image) .c-breadcrumb {
+  padding-inline: var(--image-inline-padding);
+}
+
+.p-image {
+  display: grid;
+  grid-template-rows: 1fr auto auto; // 画像 / 説明 / 前後ナビ
+  min-height: 0;
+
+  // figure を透過させ、画像と説明を別の行（横画面では別カラム）へ配置
+  &__figure {
+    display: contents;
+  }
+
+  // 画像表示枠：グリッド行いっぱいに広げる実体のあるボックス
+  // 中央寄せは img の object-position（既定で中央）、枠側では行わない
+  // NOTE: place-items: center にすると枠内の行が auto サイズ（＝画像の原寸）になり、
+  // 高さが確定しないままパーセンテージが無効化されて画像が下の行へはみ出す
+  &__frame {
+    min-height: 0; // 1fr 行を内容で押し広げない
+    overflow: hidden;
+  }
+
+  // 枠いっぱいに広げ、内容を object-fit で収める
+  // scale-down = none と contain の小さい方（縮小可／拡大不可）
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: scale-down;
+  }
+
+  &__meta {
+    min-height: 0;
+    max-height: var(--image-meta-max-height);
+    overflow-y: auto; // 長いcaptionをスクロール（固定フレーム維持）
+    overscroll-behavior-y: none;
+    font-family: var(--font-family-system);
+    text-align: center;
+    padding-block-start: var(--image-block-padding);
+    padding-inline: var(--image-inline-padding);
+  }
+
+  &__title {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+  }
+
+  &__year {
+    font-size: var(--font-size-sm);
+    text-align: center;
+  }
+
+  &__caption {
+    margin-block-start: var(--space-md);
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+    margin-block-start: var(--space-sm);
+    font-size: var(--font-size-sm);
+  }
+
+  // タグは枠で囲んで本文と区別する
+  &__tag {
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    width: fit-content;
+    margin-block-start: var(--image-block-padding);
+    margin-inline: auto;
+    margin-block-start: var(--space-sm);
+    font-family: var(--font-family-system);
+    font-size: var(--font-size-sm);
+  }
+
+  // 現在位置（並び順 / 全体数）
+  // リンクではないので nav-link の固定幅は与えない
+  &__nav-position {
+    text-align: center; // _base の p { text-align: justify } を上書き
+    font-variant-numeric: tabular-nums; // 桁が変わっても左右の記号がぶれないように
+  }
+
+  &__nav-link {
+    width: 3rem;
+    padding-block: var(--space-sm);
+    text-align: center;
+
+    &:hover,
+    &:focus,
+    &:active {
+      font-weight: var(--font-weight-medium);
+    }
+
+    // 端の作品：レイアウトを保つため要素は残し、操作対象でないことを示す
+    &.is-disabled {
+      color: var(--color-border);
+      cursor: default;
+    }
+  }
+
+  // 前後ナビは記号のみ。読み上げ用の文言は Blade の aria-label が担う
+  &__nav-link--symbol {
+    font-size: var(--font-size-lg);
+    line-height: 1;
+  }
+}
+
+// 横長画面（3:2 以上）とアプリ風ボックス表示：画像を左に全高で配置
+//  ヘッダー・パンくず・説明・前後ナビ・フッターを右カラムに縦積み
+//  :has() でこのページだけ body グリッドを組み替え
+//  display: contents で main / article / figure を透過させて中身を body グリッドへ（_top.scss と同じ手法）
+//  ボックス表示（1400×700＝2:1）はビューポート比率が 3:2 未満でも成立しうるため条件を併記
+// スマホ横向き（高さ 400px 前後）も対象に含める：
+//  rem は vmin 基準で縮み、説明欄も --image-meta-max-height で頭打ちになるため、
+//  画面高に対する各要素の割合は一定に保たれる（ヘッダー等 約37% ＋ 説明 50% ＋ ナビ 約10%）
+@media (min-aspect-ratio: 3 / 2), (min-width: 1400px) and (min-height: 700px) {
+  body:has(.p-image) {
+    // 横長は縦に余裕があるため説明欄の上限を緩める
+    --image-meta-max-height: calc(var(--viewport-h) * 0.5);
+
+    // display: contents で失われる .l-main の余白を右端に付け直す
+    // グリッドのトラックは content box 内に並ぶため、
+    // 右カラムの5要素（ヘッダー・パンくず・説明・前後ナビ・フッター）をすべて同じ幅にし、
+    // 中央揃えの基準を揃える
+    // 画像は左端のため影響を受けない
+    padding-inline-end: var(--image-inline-padding);
+
+    // 左カラム幅：「画面の高さ」と「右カラム最小幅＋列間を除いた残り」の短い方
+    // 前者が効くことで、画像スペースの横幅は高さを超えない（＝正方形の枠に収まる）
+    // column-gap の分を引かないと右カラムが最小幅を割り、フッターナビが収まらない
+    grid-template-columns:
+      min(
+        var(--viewport-h),
+        calc(100% - var(--image-meta-min-width) - var(--image-inline-padding))
+      )
+      1fr;
+    // 説明と前後ナビを空の 1fr 行で挟み、パンくずとフッターの間で縦中央に置く
+    grid-template-rows:
+      var(--header-height)
+      var(--breadcrumb-height)
+      1fr
+      auto
+      auto
+      1fr
+      auto;
+    grid-template-areas:
+      "figure header"
+      "figure breadcrumb"
+      "figure ."
+      "figure meta"
+      "figure nav"
+      "figure ."
+      "figure footer";
+    column-gap: var(--image-inline-padding);
+
+    .l-main,
+    .p-image {
+      display: contents; // figure はベース側で既に display: contents
+    }
+
+    .c-breadcrumb {
+      grid-area: breadcrumb;
+    }
+
+    // 表示枠は全行にまたがるため、高さは画面（ボックス）の高さと一致する
+    // 画像の収め方はベース側（width/height 100% ＋ object-fit: scale-down）と共通
+    .p-image__frame {
+      grid-area: figure;
+    }
+
+    .p-image__meta {
+      grid-area: meta;
+    }
+
+    // 説明との間隔はベース側の margin-block-start（--image-block-padding）が担う
+    .p-image__nav {
+      grid-area: nav;
+    }
+  }
+}

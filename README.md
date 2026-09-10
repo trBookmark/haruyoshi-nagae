@@ -159,7 +159,7 @@ cp .env.example .env
 ### 本番 （共用レンタルサーバー）
 
 ```bash
-composer install
+composer install --no-dev --optimize-autoloader
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed

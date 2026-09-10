@@ -1,0 +1,95 @@
+// ベーススタイル
+
+// ページ遷移をクロスフェードに（View Transitions、非対応ブラウザは通常遷移）
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+// 可変 rem：小画面では vmin 基準で全体が縮む（旧サイトの挙動を clamp() で再現）
+:root {
+  font-size: 16px; // clamp() 非対応ブラウザ用フォールバック
+  font-size: clamp(10px, 3.125vmin, 16px);
+}
+
+html {
+  background-color: var(--color-bg);
+}
+
+// 固定フレーム：body は常に画面ぴったり。スクロールは .l-main の内部のみ（アプリ的挙動）
+body {
+  position: relative; // ドロワー開閉ボタン等の absolute 配置の基準
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'header'
+    'main'
+    'footer';
+  height: 100dvh;
+  overflow: clip;
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  font-feature-settings: 'palt';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+
+  &:visited,
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--color-link-active);
+  }
+}
+
+b,
+strong {
+  font-weight: var(--font-weight-bold);
+}
+
+p {
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+// アプリ風ボックス：大画面ではサイト全体を中央のカードとして表示（旧 big_holizonal）
+// ビューポート基準値をボックス寸法に差し替えることで、ページ側の計算式はそのまま機能する
+@media (min-width: 1400px) and (min-height: 700px) {
+  :root {
+    --viewport-w: var(--content-max-width);
+    --viewport-h: var(--content-max-height);
+    // top layer の要素（<dialog>）はビューポート基準で配置されるため、ボックスの位置を渡す
+    --box-offset-x: calc((100vw - var(--content-max-width)) / 2);
+    --box-offset-y: calc((100dvh - var(--content-max-height)) / 2);
+  }
+
+  html {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+  }
+
+  body {
+    width: var(--content-max-width);
+    height: var(--content-max-height);
+    min-height: 0;
+    box-shadow: var(--shadow-box);
+  }
+}

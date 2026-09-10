@@ -75,6 +75,7 @@ class EditSiteSetting extends EditRecord
 
       $record->update([
         'description' => $data['description'],
+        'image_alt'   => $data['image_alt'] ?? null,
         'image_id'    => $newImage->id,
       ]);
 
@@ -86,9 +87,10 @@ class EditSiteSetting extends EditRecord
       return $record;
     }
 
-    // 画像なし：文面のみ更新
+    // 画像なし：文面と代替テキストのみ更新
     $record->update([
       'description' => $data['description'],
+      'image_alt'   => $data['image_alt'] ?? null,
     ]);
 
     return $record;

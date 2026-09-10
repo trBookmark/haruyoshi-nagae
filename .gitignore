@@ -6,6 +6,7 @@
 
 .phpactor.json
 .phpunit.result.cache
+/.claude/
 /.cursor/
 /.idea
 /.nova
@@ -38,6 +39,7 @@
 /vendor
 _ide_helper.php
 
+CLAUDE.local.md
 Homestead.json
 Homestead.yaml
 Thumbs.db

@@ -10,6 +10,7 @@ class PlaylistSeeder extends Seeder
 {
   /**
    * サブカテゴリ（YouTubeプレイリスト）の初期データを投入する
+   * name（URL用英語名）は旧サイトの実URLと同一のため、この4件は301リダイレクト不要
    *
    * ⚠️ 注意！: yt_playlist_id はダミー値のため、本番環境では管理画面から実IDに更新する必要がある
    * 管理画面 > サブカテゴリ > 各レコードを編集
@@ -24,25 +25,29 @@ class PlaylistSeeder extends Seeder
     $playlists = [
       [
         'category_id'    => $animationId,
-        'name'           => 'ミュージックビデオ',
+        'name'           => 'musicvideo',
+        'name_ja'        => 'ミュージックビデオ',
         'yt_playlist_id' => 'DUMMY_ANIMATION_MV', // ⚠️ 要更新
         'sort_order'     => 1,
       ],
       [
         'category_id'    => $animationId,
-        'name'           => '共同制作',
+        'name'           => 'coproduction',
+        'name_ja'        => '共同制作',
         'yt_playlist_id' => 'DUMMY_ANIMATION_CO', // ⚠️ 要更新
         'sort_order'     => 2,
       ],
       [
         'category_id'    => $animationId,
-        'name'           => '自主制作',
+        'name'           => 'animation',
+        'name_ja'        => '自主制作',
         'yt_playlist_id' => 'DUMMY_ANIMATION_AN', // ⚠️ 要更新
         'sort_order'     => 3,
       ],
       [
         'category_id'    => $musicId,
-        'name'           => '雨にまつわる音楽',
+        'name'           => 'rain',
+        'name_ja'        => '雨にまつわる音楽',
         'yt_playlist_id' => 'DUMMY_MUSIC_RAIN', // ⚠️ 要更新
         'sort_order'     => 1,
       ],

@@ -1,0 +1,22 @@
+// サムネイル表示位置（images.thumbnail_align: c/t/r/b/l に対応。管理画面で設定）
+.u-img-align {
+  &--c {
+    object-position: center;
+  }
+
+  &--t {
+    object-position: top;
+  }
+
+  &--r {
+    object-position: right;
+  }
+
+  &--b {
+    object-position: bottom;
+  }
+
+  &--l {
+    object-position: left;
+  }
+}

@@ -159,14 +159,13 @@ cp .env.example .env
 ### 本番 （共用レンタルサーバー）
 
 ```bash
-composer install
+composer install --no-dev --optimize-autoloader
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
 php artisan filament:assets # Filament アセットの公開
 php artisan storage:link
-php artisan make:filament-user # 管理者ユーザーを対話式で作成
-php artisan db:seed --class=PlaylistSeeder
+php artisan make:admin-user # 管理者ユーザーを対話式で作成（role=管理者 を設定。make:filament-user は role 未設定のため使用しない）
 ```
 
 **Cron の設定（本番のみ）:**

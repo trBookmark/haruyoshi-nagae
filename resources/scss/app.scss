@@ -1,0 +1,21 @@
+// エントリーポイント：各層の @use のみ
+@use 'foundation/tokens';
+@use 'foundation/reset';
+@use 'foundation/base';
+
+@use 'layout/header';
+@use 'layout/main';
+@use 'layout/footer';
+@use 'layout/drawer';
+
+@use 'components/breadcrumb';
+@use 'components/reveal';
+
+@use 'utility/image-align';
+
+@use 'pages/top';
+@use 'pages/gallery';
+@use 'pages/category';
+@use 'pages/image';
+
+// components / pages は各機能ブランチでここに追記

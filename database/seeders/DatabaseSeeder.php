@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
   public function run(): void
   {
     $this->call([
-      CategorySeeder::class,
+      CategorySeeder::class, // PlaylistSeeder が categories を参照するため先に実行
       SiteSettingSeeder::class,
+      PlaylistSeeder::class,
     ]);
   }
 }

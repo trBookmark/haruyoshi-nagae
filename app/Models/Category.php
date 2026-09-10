@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ModelType;
+use App\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -104,6 +105,25 @@ class Category extends Model implements Sortable
       'is_active'  => 'boolean',
       'sort_order' => 'integer',
     ];
+  }
+
+  // ──────────── Helper ────────────
+
+  /**
+   * itemCount
+   * フロントに表示する公開アイテム数を返す
+   * model_type で参照先を切り替える
+   * IMAGE: 有効な画像数 / POST: 公開済みブログ記事数 / null（プレイリスト専用）: 有効なプレイリスト数
+   *
+   * @return int
+   */
+  public function itemCount(): int
+  {
+    return match ($this->model_type) {
+      ModelType::IMAGE => $this->images()->where('is_active', true)->count(),
+      ModelType::POST  => Post::where('status', PostStatus::PUBLISHED)->count(),
+      null             => $this->playlists()->where('is_active', true)->count(),
+    };
   }
 
   // ──────────── Relations ────────────

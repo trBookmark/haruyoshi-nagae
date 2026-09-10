@@ -2,8 +2,8 @@
 
 [![tests](https://github.com/trBookmark/haruyoshi-nagae/actions/workflows/tests.yml/badge.svg)](https://github.com/trBookmark/haruyoshi-nagae/actions/workflows/tests.yml)
 
-アーティスト [長江春芳](https://twitter.com/N_haruyoshi) のためのポートフォリオサイト。\
-Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整理しながらフルリニューアル。
+アーティスト [長江春芳](https://twitter.com/N_haruyoshi) のためのポートフォリオサイト\
+Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整理しながらフルリニューアル
 
 ---
 
@@ -31,8 +31,11 @@ Filament v5 を利用した画像管理 CMS
 - **画像管理**: アップロード・表示切替・タイトル/タグ編集・並べ替え・削除
 - **複数サイズ自動生成**: アップロード時に original / large / medium / thumb を自動生成
 - **ブログ管理**: 下書き・公開・非公開の 3 ステータス管理
-- **タグ管理**: 画像とブログで共用。使用中タグは削除不可
-- **カテゴリ管理**: 表示名・画像・並び順の編集（管理者：新規作成・削除）
+- **タグ管理**: 画像とブログで共用、使用中タグは削除不可
+- **カテゴリ管理**:
+  - 表示名・カバー画像・並び順の編集、新規作成（管理者のみ）
+  - 誤操作とデータ不整合を防ぐため削除不可
+  - 使用可否は `is_active` で切り替える
 - **サブカテゴリ管理**: YouTube プレイリストと連携（1 階層）
 - **サイト設定**: 特定ページのテキスト・画像を管理画面から編集
 
@@ -52,8 +55,8 @@ CMSに不慣れなアーティストでも扱いやすいシンプル構成を�
 
 ### シンプルさの維持
 
-- 余分な機能は加えない。
-- アーティストの作品が主役になるよう、サイト自体は白基調でミニマルに設計。
+- 余分な機能は加えない
+- アーティストの作品が主役になるよう、サイト自体は白基調でミニマルに設計
 
 ### 1人保守を前提とした構造
 
@@ -172,7 +175,7 @@ php artisan make:admin-user # 管理者ユーザーを対話式で作成（role=
 
 **Cron の設定（本番のみ）:**
 
-Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」に以下を登録する。
+Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」に以下を登録する
 
 ```
 * * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
@@ -198,19 +201,40 @@ Laravel のスケジューラを動かすため、cPanel の「Cron ジョブ」
 
 ## テスト
 
-Pest および別のテスト用 DB `testing` を使用
-（`RefreshDatabase` で毎回初期化されるため）
+Pest による Feature テストを用意\
+テスト用 DB `testing` を使用し、`RefreshDatabase` で各テストごとに初期化する
+
+網羅率ではなく、壊れたときの影響が大きい導線を対象に選定している
+
+| 対象 | 内容 |
+|---|---|
+| フロント | トップページ、Gallery カテゴリ一覧、カテゴリ別画像一覧、画像個別ページ |
+| 管理画面 | 未認証時のリダイレクト、ログイン処理、ロール別の認可 |
+| CRUD | Tag / Category の作成・更新・削除、および削除制限 |
+| 画像処理 | アップロードから original / large / medium / thumb の生成まで、カテゴリ内の重複検出 |
 
 ```bash
 # 初回のみ: テスト用 DB を作成
 ./vendor/bin/sail mariadb -e "CREATE DATABASE IF NOT EXISTS testing;"
 
 # 全テスト実行
-./vendor/bin/sail pest
+./vendor/bin/sail artisan test
 
 # 特定のテストのみ実行
-./vendor/bin/sail pest --filter=SystemCategoryGuardTest
+./vendor/bin/sail artisan test --filter=ImageUploadServiceTest
 ```
+
+### CI
+
+GitHub Actions で、main / develop への push と全ての Pull Request をトリガーに以下を並列実行する
+
+| ジョブ | 内容 |
+|---|---|
+| Feature テスト | PHP 8.3 / MariaDB 11 で `php artisan test` |
+| フロントのビルド | `npm ci && npm run build` |
+
+ExifTool を必要とするテスト（JPEG / PNG の EXIF 除去を通る経路）は、`EXIFTOOL_BINARY` が実行可能でない環境では自動的にスキップされる。CI には ExifTool を導入していないため、その分がスキップとして計上される。GIF はこの経路を通らないため常に実行される。
+
 ---
 
 ## 担当範囲

@@ -1,5 +1,7 @@
 # 長江春芳 ポートフォリオ
 
+[![tests](https://github.com/trBookmark/haruyoshi-nagae/actions/workflows/tests.yml/badge.svg)](https://github.com/trBookmark/haruyoshi-nagae/actions/workflows/tests.yml)
+
 アーティスト [長江春芳](https://twitter.com/N_haruyoshi) のためのポートフォリオサイト。\
 Laravel 10 ベースの既存サイトを Laravel 13 へ移行し、構成を整理しながらフルリニューアル。
 

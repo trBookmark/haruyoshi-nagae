@@ -1,0 +1,98 @@
+name: tests
+
+# main / develop への push と、全ての Pull Request で実行する
+# feature ブランチへの push 単体では走らせない（PR を出した時点で検証されるため）
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  test:
+    name: Feature テスト
+    runs-on: ubuntu-latest
+
+    # 本番と同じ MariaDB でテストする（ローカルの Sail も mariadb:11）
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: password
+          MARIADB_DATABASE: testing
+        ports:
+          - 3306:3306
+        # 起動完了を待たずに接続すると失敗するため health check で待つ
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: PHP をセットアップ
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          # gd: Intervention Image v3 のドライバ / pdo_mysql: MariaDB 接続
+          extensions: gd, exif, pdo_mysql, mbstring, zip, bcmath, intl
+          coverage: none
+
+      - name: Composer のキャッシュディレクトリを取得
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Composer をキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: 依存パッケージをインストール
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: .env を用意
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: テストを実行
+        # Laravel の Dotenv は既存の環境変数を上書きしないため、
+        # ここで渡した値が .env.example のプレースホルダより優先される
+        #
+        # ExifTool は意図的にインストールしていない。
+        # .env.example の EXIFTOOL_BINARY は CI 上に存在せず is_executable() が false になるため、
+        # ImageUploadServiceTest の JPEG / PNG のケースは自動でスキップされる
+        env:
+          DB_CONNECTION: mariadb
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+        run: php artisan test
+
+  build:
+    name: フロントのビルド
+    runs-on: ubuntu-latest
+
+    # テストは withoutVite() でビルド状態から独立しているため、test ジョブとは並列に実行する
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: Node をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          # Vite 8 の要件を満たすバージョン
+          node-version: '22'
+          cache: npm
+
+      - name: 依存パッケージをインストール
+        run: npm ci
+
+      - name: ビルド
+        run: npm run build
